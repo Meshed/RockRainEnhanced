@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using RockRainEnhanced.GameScenes;
 
 namespace RockRainEnhanced
@@ -15,10 +8,10 @@ namespace RockRainEnhanced
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        readonly GraphicsDeviceManager _graphics;
+        SpriteBatch _spriteBatch;
         protected AudioLibrary audio;
 
         // Game scenes
@@ -33,38 +26,25 @@ namespace RockRainEnhanced
         protected Texture2D actionElementsTexture, actionBackgroundTexture;
 
         // Fonts
-        private SpriteFont smallFont, largeFont, scoreFont;
+        private SpriteFont _smallFont, _largeFont, _scoreFont;
 
-        protected KeyboardState oldKeyboardState;
+        private KeyboardState oldKeyboardState;
         protected GamePadState oldGamePadState;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
-            graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
-            graphics.IsFullScreen = true;
+            _graphics = new GraphicsDeviceManager(this);
+            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            _graphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
-        }
-
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
-        {
-            // TODO: Add your initialization logic here
-
-            base.Initialize();
         }
 
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            Services.AddService(typeof(SpriteBatch), spriteBatch);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            Services.AddService(typeof(SpriteBatch), _spriteBatch);
 
             audio = new AudioLibrary();
             audio.LoadContent(this.Content);
@@ -76,17 +56,17 @@ namespace RockRainEnhanced
             Components.Add(helpScene);
 
             // Create the Start scene
-            smallFont = Content.Load<SpriteFont>("menuSmall");
-            largeFont = Content.Load<SpriteFont>("menuLarge");
+            _smallFont = Content.Load<SpriteFont>("menuSmall");
+            _largeFont = Content.Load<SpriteFont>("menuLarge");
             startBackgroundTexture = Content.Load<Texture2D>("startBackground");
             startElementsTexture = Content.Load<Texture2D>("startSceneElements");
-            startScene = new StartScene(this, smallFont, largeFont, startBackgroundTexture, startElementsTexture);
+            startScene = new StartScene(this, _smallFont, _largeFont, startBackgroundTexture, startElementsTexture);
             Components.Add(startScene);
 
             actionElementsTexture = Content.Load<Texture2D>("rockrainenhanced");
             actionBackgroundTexture = Content.Load<Texture2D>("spacebackground");
-            scoreFont = Content.Load<SpriteFont>("score");
-            actionScene = new ActionScene(this, actionElementsTexture, actionBackgroundTexture, scoreFont);
+            _scoreFont = Content.Load<SpriteFont>("score");
+            actionScene = new ActionScene(this, actionElementsTexture, actionBackgroundTexture, _scoreFont);
             Components.Add(actionScene);
 
             startScene.Show();
@@ -120,9 +100,9 @@ namespace RockRainEnhanced
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
+            _spriteBatch.Begin();
             base.Draw(gameTime);
-            spriteBatch.End();
+            _spriteBatch.End();
         }
 
         private void HandleScenesInput()
