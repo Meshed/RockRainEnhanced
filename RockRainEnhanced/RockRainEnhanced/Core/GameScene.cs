@@ -30,6 +30,7 @@ namespace RockRainEnhanced
             components = new List<GameComponent>();
             Visible = false;
             Enabled = false;
+            
         }
 
         /// <summary>

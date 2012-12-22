@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using RockRain;
 using RockRainEnhanced.Core;
+using RockRainEnhanced.ControllerStrategy;
 
 
 namespace RockRainEnhanced.GameScenes
@@ -31,7 +32,9 @@ namespace RockRainEnhanced.GameScenes
         protected ImageComponent background;
         protected Score scorePlayer1;
         protected Score scorePlayer2;
-
+#if DEBUG
+        TextComponent positionDebugText;
+#endif
         protected Vector2 pausePosition;
         protected Vector2 gameoverPosition;
         protected Rectangle pauseRect = new Rectangle(1, 120, 200, 44);
@@ -41,34 +44,36 @@ namespace RockRainEnhanced.GameScenes
         protected bool gameOver;
         protected TimeSpan elapsedTime = TimeSpan.Zero;
         protected bool twoPlayers;
+        Game1 game1;
+        Texture2D actionElementsTexture;
+        Texture2D actionBackgroundTexture;
+        SpriteFont scoreFont;
+        IController[] controllers;
 
-        public ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font)
-            : base(game)
+        ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font):base(game)
         {
-            audio = (AudioLibrary) Game.Services.GetService(typeof (AudioLibrary));
+            audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
             background = new ImageComponent(game, backgroundTexture, ImageComponent.DrawMode.Stretch);
             Components.Add(background);
 
             actionTexture = theTexture;
 
-            spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
+            spriteBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
             meteors = new MeteorsManager(Game, ref actionTexture);
             Components.Add(meteors);
 
-            player1 = new Player(Game, ref actionTexture, PlayerIndex.One, new Rectangle(323, 15, 30, 30));
-            player1.Initialize();
-            Components.Add(player1);
 
-            player2 = new Player(Game, ref actionTexture, PlayerIndex.Two, new Rectangle(360, 17, 30, 30));
-            player2.Initialize();
-            Components.Add(player2);
-
+            // TODO: Complete member initialization
+            this.game1 = game1;
+            this.actionElementsTexture = actionElementsTexture;
+            this.actionBackgroundTexture = actionBackgroundTexture;
+            this.scoreFont = font;
+          
+            
             scorePlayer1 = new Score(game, font, Color.Blue);
             scorePlayer1.Position = new Vector2(10, 10);
             Components.Add(scorePlayer1);
-            scorePlayer2 = new Score(game, font, Color.Red);
-            scorePlayer2.Position = new Vector2(Game.Window.ClientBounds.Width - 200, 10);
-            Components.Add(scorePlayer2);
+           
 
             rumblePad = new SimpleRumblePad(game);
             Components.Add(rumblePad);
@@ -76,7 +81,37 @@ namespace RockRainEnhanced.GameScenes
             powerSource = new PowerSource(game, ref actionTexture);
             powerSource.Initialize();
             Components.Add(powerSource);
+#if DEBUG
+            positionDebugText=new TextComponent(game,this.scoreFont,new Vector2(),Color.Red);
+            Components.Add(positionDebugText);
+#endif
         }
+        public ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font,Rectangle screenBounds, params IController[] controllers)
+            :this(game,theTexture,backgroundTexture,font)
+        {
+            this.TwoPlayers = false;
+            player1 = new Player(Game, ref actionTexture,  new Vector2(screenBounds.Width / 3, 0), new Rectangle(323, 15, 30, 30),controllers);
+            player1.Initialize();
+            Components.Add(player1);   
+        }
+        public ActionScene(IController playerOneController,IController playerTwoController,Game game, Texture2D theTexture, Texture2D backgroundTexture,Rectangle screenBounds, SpriteFont font)
+            : this(game, theTexture, backgroundTexture, font)
+        {
+            
+            this.TwoPlayers = true;
+            player1 = new Player(Game, ref actionTexture,new Vector2(screenBounds.Width / 3, 0), new Rectangle(323, 15, 30, 30),playerOneController);
+            player1.Initialize();
+            Components.Add(player1);
+
+            scorePlayer2 = new Score(game, font, Color.Red);
+            scorePlayer2.Position = new Vector2(Game.Window.ClientBounds.Width - 200, 10);
+            Components.Add(scorePlayer2);
+            player2 = new Player(Game, ref actionTexture, new Vector2((int)(screenBounds.Width / 1.5), 0), new Rectangle(360, 17, 30, 30), playerTwoController);
+            player2.Initialize();
+            Components.Add(player2);
+        }
+
+      
 
         public bool TwoPlayers
         {
@@ -108,21 +143,26 @@ namespace RockRainEnhanced.GameScenes
 
         public override void Show()
         {
+            
             MediaPlayer.Play(audio.BackMusic);
             meteors.Initialize();
             powerSource.PutinStartPosition();
 
             player1.Reset();
-            player2.Reset();
-
+            if (player2 != null)
+            {
+                player2.Reset();
+                player2.Visible = twoPlayers;
+                player2.Enabled = twoPlayers;
+                scorePlayer2.Visible = twoPlayers;
+                scorePlayer2.Enabled = twoPlayers;
+            }
+            
             paused = false;
             pausePosition.X = (Game.Window.ClientBounds.Width - pauseRect.Width/2);
             pausePosition.Y = (Game.Window.ClientBounds.Height - pauseRect.Height/2);
 
-            player2.Visible = twoPlayers;
-            player2.Enabled = twoPlayers;
-            scorePlayer2.Visible = twoPlayers;
-            scorePlayer2.Enabled = twoPlayers;
+            
 
             base.Show();
         }
@@ -151,6 +191,7 @@ namespace RockRainEnhanced.GameScenes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
+            
             if ((!paused) && (!gameOver))
             {
                 HandleDamages();
@@ -167,11 +208,14 @@ namespace RockRainEnhanced.GameScenes
                 }
 
                 // Check if player is dead
-                gameOver = ((player1.Power <= 0) || (player2.Power <= 0));
+                gameOver = ((player1.Power <= 0) || (player2 != null && player2.Power <= 0));
                 if (gameOver)
                 {
                     player1.Visible = (player1.Power > 0);
-                    player2.Visible = (player2.Power > 0) && twoPlayers;
+                    if (twoPlayers)
+                    {
+                        player2.Visible = (player2.Power > 0);
+                    }
                     MediaPlayer.Stop();
                 }
 
@@ -182,6 +226,7 @@ namespace RockRainEnhanced.GameScenes
             {
                 meteors.Update(gameTime);
             }
+            positionDebugText.Text = player1.GetBounds().ToString();
         }
 
         private void HandleDamages()
@@ -245,6 +290,16 @@ namespace RockRainEnhanced.GameScenes
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
+            if (this.Components.Contains(this.player1) == false && this.Components.Contains(this.player2) == false)
+                throw new InvalidOperationException("No players found");
+            if (this.Components.OfType<Player>().Select(p => p.DrawOrder).Any(dOrder =>
+                this.Components.OfType<DrawableGameComponent>()
+                    .Except(this.Components.OfType<Player>())
+                    .Select(c => c.DrawOrder)
+                    .All(c => dOrder > c)))
+            {
+                throw new InvalidOperationException("Players are not top component");
+            }
 
             if (paused)
             {
