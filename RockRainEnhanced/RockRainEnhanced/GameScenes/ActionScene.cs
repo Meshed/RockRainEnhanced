@@ -270,6 +270,7 @@ namespace RockRainEnhanced.GameScenes
             {
                 _meteors.AllMeteors.Remove(m.m1);
                 _meteors.AllMeteors.Remove(m.m2);
+                _audio.Explosion.Play();
             }
         }
 
