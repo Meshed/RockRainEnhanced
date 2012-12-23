@@ -73,13 +73,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioLibrary.cs" />
+    <Compile Include="ControllerStrategy\ArrowController.cs" />
+    <Compile Include="ControllerStrategy\ControllerCommon.cs" />
+    <Compile Include="ControllerStrategy\IController.cs" />
+    <Compile Include="ControllerStrategy\WasdController.cs" />
+    <Compile Include="ControllerStrategy\XboxController.cs" />
     <Compile Include="Core\GameScene.cs" />
     <Compile Include="Core\ImageComponent.cs" />
     <Compile Include="Core\Sprite.cs" />
+    <Compile Include="Core\TextComponent.cs" />
     <Compile Include="Core\TextMenuComponent.cs" />
     <Compile Include="Core\GamePadRumble.cs" />
+    <Compile Include="Extensions\BaseExtensions.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\GameExtensions.cs" />
     <Compile Include="GameScenes\ActionScene.cs" />
     <Compile Include="GameScenes\HelpScene.cs" />
+    <Compile Include="GameScenes\JoinScene.cs" />
     <Compile Include="GameScenes\StartScene.cs" />
     <Compile Include="Meteor.cs" />
     <Compile Include="MeteorsManager.cs" />

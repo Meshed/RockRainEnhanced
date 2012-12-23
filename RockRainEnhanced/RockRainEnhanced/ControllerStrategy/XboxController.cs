@@ -27,7 +27,7 @@ using Microsoft.Xna.Framework;
         public XboxController(PlayerIndex index)
         {
             _index = index;
-            XSensitivity = -1;
+            XSensitivity = 1;
             YSensitivity = 1;
             _controllerCommon = new ControllerCommon<GamePadState, Buttons>((gs, b) => gs.IsButtonDown(b), (gs, b) => gs.IsButtonUp(b), () => GamePad.GetState(_index));
             UseContinuous = true;
@@ -79,7 +79,7 @@ using Microsoft.Xna.Framework;
             if (left)
                 return value * sensitivity;
             if (right)
-                return -1*sensitivity * value;
+                return sensitivity * value;
             return 0;
         }
 

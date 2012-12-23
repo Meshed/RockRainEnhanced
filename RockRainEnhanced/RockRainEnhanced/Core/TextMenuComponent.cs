@@ -160,7 +160,7 @@ namespace RockRainEnhanced.Core
             base.Draw(gameTime);
         }
 
-        public void SetMenuItems(string[] items)
+        public void SetMenuItems(params string[] items)
         {
             menuItems.Clear();
             menuItems.AddRange(items);
