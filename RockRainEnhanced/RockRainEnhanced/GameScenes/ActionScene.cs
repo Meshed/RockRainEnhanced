@@ -154,6 +154,8 @@ namespace RockRainEnhanced.GameScenes
                 _player2.Enabled = _twoPlayers;
                 _score_player2.Visible = _twoPlayers;
                 _score_player2.Enabled = _twoPlayers;
+                _score_player2.Visible = _twoPlayers;
+                _score_player2.Enabled = _twoPlayers;
             }
             
             _paused = false;
@@ -164,10 +166,8 @@ namespace RockRainEnhanced.GameScenes
             _gameoverPosition.X = (Game.Window.ClientBounds.Width - _gameoverRect.Width)/2;
             _gameoverPosition.Y = (Game.Window.ClientBounds.Height - _gameoverRect.Height)/2;
 
-            _player2.Visible = _twoPlayers;
-            _player2.Enabled = _twoPlayers;
-            _score_player2.Visible = _twoPlayers;
-            _score_player2.Enabled = _twoPlayers;
+          
+          
 
             base.Show();
         }
