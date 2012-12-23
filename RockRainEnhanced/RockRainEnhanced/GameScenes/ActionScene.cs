@@ -154,6 +154,8 @@ namespace RockRainEnhanced.GameScenes
                 _player2.Enabled = _twoPlayers;
                 _score_player2.Visible = _twoPlayers;
                 _score_player2.Enabled = _twoPlayers;
+                _score_player2.Visible = _twoPlayers;
+                _score_player2.Enabled = _twoPlayers;
             }
             
             _paused = false;
@@ -164,10 +166,8 @@ namespace RockRainEnhanced.GameScenes
             _gameoverPosition.X = (Game.Window.ClientBounds.Width - _gameoverRect.Width)/2;
             _gameoverPosition.Y = (Game.Window.ClientBounds.Height - _gameoverRect.Height)/2;
 
-            _player2.Visible = _twoPlayers;
-            _player2.Enabled = _twoPlayers;
-            _score_player2.Visible = _twoPlayers;
-            _score_player2.Enabled = _twoPlayers;
+          
+          
 
             base.Show();
         }
@@ -260,6 +260,16 @@ namespace RockRainEnhanced.GameScenes
                     _player2.Power -= 10;
                     _player2.Score -= 10;
                 }
+            }
+            var q = from m1 in _meteors.AllMeteors
+                    from m2 in _meteors.AllMeteors
+                    where m1 != m2
+                    where m1.CheckCollision(m2)
+                    select new { m1, m2 };
+            foreach (var m in q.ToArray())
+            {
+                _meteors.AllMeteors.Remove(m.m1);
+                _meteors.AllMeteors.Remove(m.m2);
             }
         }
 
