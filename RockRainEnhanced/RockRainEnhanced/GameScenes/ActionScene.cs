@@ -240,6 +240,7 @@ namespace RockRainEnhanced.GameScenes
             if (_meteors.CheckForCollisions(_player1.GetBounds()))
             {
                 _player1.Power -= 10;
+                _player1.PowerLossPerSecond++;
                 _player1.Score -= 1;
             }
 
@@ -249,6 +250,7 @@ namespace RockRainEnhanced.GameScenes
                 if (_meteors.CheckForCollisions(_player2.GetBounds()))
                 {
                     _player2.Power -= 10;
+                    _player2.PowerLossPerSecond++;
                     _player2.Score -= 10;
                 }
 

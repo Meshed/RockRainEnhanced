@@ -24,6 +24,7 @@ namespace RockRainEnhanced
         const int Velocity = 5;
         IEnumerable<IController> _controllers;
         Vector2 _initialPosition;
+        public int PowerLossPerSecond { get; set; }
 
         public Player(Game game, ref Texture2D theTexture, Vector2 initialPosition, Rectangle rectangle, params IController[] controllers)
             : base(game)
@@ -41,7 +42,7 @@ namespace RockRainEnhanced
                 throw new ArgumentOutOfRangeException("Player sprite");
             if (screenBounds.Width < _spriteRectangle.Width)
                 throw new ArgumentOutOfRangeException("ScreenBounds or PlayerSprite");
-
+            PowerLossPerSecond = 1;
         }
 
         public void Reset()
@@ -85,7 +86,7 @@ namespace RockRainEnhanced
             {
                 _elapsedTime -= TimeSpan.FromSeconds(1);
                 _score++;
-                Power--;
+                Power -= PowerLossPerSecond;
             }
 
             base.Update(gameTime);
