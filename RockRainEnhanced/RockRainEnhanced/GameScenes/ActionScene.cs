@@ -1,16 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using RockRain;
 using RockRainEnhanced.Core;
-
 
 namespace RockRainEnhanced.GameScenes
 {
@@ -22,7 +15,6 @@ namespace RockRainEnhanced.GameScenes
         private readonly Texture2D _actionTexture;
         private readonly AudioLibrary _audio;
         private readonly SpriteBatch _spriteBatch;
-
         private readonly Player _player1;
         private readonly Player _player2;
         private readonly MeteorsManager _meteors;
@@ -31,12 +23,10 @@ namespace RockRainEnhanced.GameScenes
         private readonly ImageComponent _background;
         private readonly Score _scorePlayer1;
         private readonly Score _scorePlayer2;
-
         private Vector2 _pausePosition;
-        private Vector2 gameoverPosition;
+        private Vector2 _gameoverPosition;
         private Rectangle _pauseRect = new Rectangle(1, 120, 200, 44);
-        private Rectangle gameoverRect = new Rectangle(1, 170, 350, 48);
-
+        private Rectangle _gameoverRect = new Rectangle(1, 170, 350, 48);
         private bool _paused;
         private bool _gameOver;
         private TimeSpan _elapsedTime = TimeSpan.Zero;
@@ -63,11 +53,9 @@ namespace RockRainEnhanced.GameScenes
             _player2.Initialize();
             Components.Add(_player2);
 
-            _scorePlayer1 = new Score(game, font, Color.Blue);
-            _scorePlayer1.Position = new Vector2(10, 10);
+            _scorePlayer1 = new Score(game, font, Color.Blue) {Position = new Vector2(10, 10)};
             Components.Add(_scorePlayer1);
-            _scorePlayer2 = new Score(game, font, Color.Red);
-            _scorePlayer2.Position = new Vector2(Game.Window.ClientBounds.Width - 200, 10);
+            _scorePlayer2 = new Score(game, font, Color.Red) {Position = new Vector2(Game.Window.ClientBounds.Width - 200, 10)};
             Components.Add(_scorePlayer2);
 
             _rumblePad = new SimpleRumblePad(game);
@@ -119,6 +107,10 @@ namespace RockRainEnhanced.GameScenes
             _pausePosition.X = (Game.Window.ClientBounds.Width - _pauseRect.Width)/2;
             _pausePosition.Y = (Game.Window.ClientBounds.Height - _pauseRect.Height)/2;
 
+            _gameOver = false;
+            _gameoverPosition.X = (Game.Window.ClientBounds.Width - _gameoverRect.Width)/2;
+            _gameoverPosition.Y = (Game.Window.ClientBounds.Height - _gameoverRect.Height)/2;
+
             _player2.Visible = _twoPlayers;
             _player2.Enabled = _twoPlayers;
             _scorePlayer2.Visible = _twoPlayers;
@@ -132,17 +124,6 @@ namespace RockRainEnhanced.GameScenes
             MediaPlayer.Stop();
 
             base.Hide();
-        }
-
-        /// <summary>
-        /// Allows the game component to perform any initialization it needs to before starting
-        /// to run.  This is where it can query for any required services and load content.
-        /// </summary>
-        public override void Initialize()
-        {
-            // TODO: Add your initialization code here
-
-            base.Initialize();
         }
 
         /// <summary>
@@ -263,7 +244,7 @@ namespace RockRainEnhanced.GameScenes
 
             if (_gameOver)
             {
-                _spriteBatch.Draw(_actionTexture, gameoverPosition, gameoverRect, Color.White);
+                _spriteBatch.Draw(_actionTexture, _gameoverPosition, _gameoverRect, Color.White);
             }
         }
     }
