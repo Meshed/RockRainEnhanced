@@ -225,7 +225,7 @@ namespace RockRainEnhanced
         private void HandleActionInput()
         {
             
-            if ((_joinScene.PlayerOne != null && _joinScene.PlayerOne.IsEnter) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsEnter))
+            if ((!_actionScene.TwoPlayers && menuControllers.Any(m=>m.IsEnter )) || (_joinScene.PlayerOne != null && _joinScene.PlayerOne.IsEnter) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsEnter))
             {
                 if (_actionScene.GameOver)
                 {
@@ -238,7 +238,7 @@ namespace RockRainEnhanced
                 }
             }
 
-            if ((_joinScene.PlayerOne!= null && _joinScene.PlayerOne.IsBack ) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsBack))
+            if ((!_actionScene.TwoPlayers && menuControllers.Any(m=>m.IsBack)) || (_joinScene.PlayerOne!= null && _joinScene.PlayerOne.IsBack ) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsBack))
             {
                 ShowScene(_startScene);
             }

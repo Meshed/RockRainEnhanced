@@ -228,7 +228,7 @@ namespace RockRainEnhanced.GameScenes
             {
                 meteors.Update(gameTime);
             }
-            positionDebugText.Text = player2.GetBounds().ToString();
+            positionDebugText.Text =( player2 ?? player1).GetBounds().ToString();
         }
 
         private void HandleDamages()
