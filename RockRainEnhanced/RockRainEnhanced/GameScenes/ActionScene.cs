@@ -261,6 +261,16 @@ namespace RockRainEnhanced.GameScenes
                     _player2.Score -= 10;
                 }
             }
+            var q = from m1 in _meteors.AllMeteors
+                    from m2 in _meteors.AllMeteors
+                    where m1 != m2
+                    where m1.CheckCollision(m2)
+                    select new { m1, m2 };
+            foreach (var m in q.ToArray())
+            {
+                _meteors.AllMeteors.Remove(m.m1);
+                _meteors.AllMeteors.Remove(m.m2);
+            }
         }
 
         private void HandlePowerSourceSprite(GameTime gameTime)

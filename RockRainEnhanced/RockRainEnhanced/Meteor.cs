@@ -127,6 +127,12 @@ namespace RockRainEnhanced
             base.Update(gameTime);
         }
 
+        public bool CheckCollision(Meteor otherMeteor)
+        {
+            Rectangle spriteRect = new Rectangle((int)position.X, (int)position.Y, currentFrame.Width, currentFrame.Height);
+            return otherMeteor.CheckCollision(spriteRect);
+        }
+
         public bool CheckCollision(Rectangle rect)
         {
             Rectangle spriteRect = new Rectangle((int) position.X, (int) position.Y, currentFrame.Width, currentFrame.Height);
