@@ -43,6 +43,7 @@ namespace RockRainEnhanced.GameScenes
 
             _spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
             _meteors = new MeteorsManager(Game, ref _actionTexture);
+            _meteors.Initialize();
             Components.Add(_meteors);
 
             _player1 = new Player(Game, ref _actionTexture, PlayerIndex.One, new Rectangle(323, 15, 30, 30));

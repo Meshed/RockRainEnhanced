@@ -12,7 +12,7 @@ namespace RockRainEnhanced
     {
         readonly GraphicsDeviceManager _graphics;
         SpriteBatch _spriteBatch;
-        protected AudioLibrary audio;
+        private AudioLibrary _audio;
 
         // Game scenes
         protected HelpScene helpScene;
@@ -28,15 +28,21 @@ namespace RockRainEnhanced
         // Fonts
         private SpriteFont _smallFont, _largeFont, _scoreFont;
 
-        private KeyboardState oldKeyboardState;
-        protected GamePadState oldGamePadState;
+        private KeyboardState _oldKeyboardState;
+        private GamePadState _oldGamePadState;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
+#if DEBUG
+            _graphics.PreferredBackBufferWidth = 800;
+            _graphics.PreferredBackBufferHeight = 600;
+            _graphics.IsFullScreen = false;
+#else
             _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             _graphics.IsFullScreen = true;
+#endif
             Content.RootDirectory = "Content";
         }
 
@@ -46,9 +52,9 @@ namespace RockRainEnhanced
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Services.AddService(typeof(SpriteBatch), _spriteBatch);
 
-            audio = new AudioLibrary();
-            audio.LoadContent(this.Content);
-            Services.AddService(typeof(AudioLibrary), audio);
+            _audio = new AudioLibrary();
+            _audio.LoadContent(this.Content);
+            Services.AddService(typeof(AudioLibrary), _audio);
 
             helpBackgroundTexture = Content.Load<Texture2D>("helpbackground");
             helpForegroundTexture = Content.Load<Texture2D>("helpforeground");
@@ -129,12 +135,12 @@ namespace RockRainEnhanced
             GamePadState gamepadState = GamePad.GetState(PlayerIndex.One);
             KeyboardState keyboardState = Keyboard.GetState();
 
-            bool result = (oldKeyboardState.IsKeyDown(Keys.Enter) && keyboardState.IsKeyUp(Keys.Enter));
-            result |= (oldGamePadState.Buttons.A == ButtonState.Pressed) &&
+            bool result = (_oldKeyboardState.IsKeyDown(Keys.Enter) && keyboardState.IsKeyUp(Keys.Enter));
+            result |= (_oldGamePadState.Buttons.A == ButtonState.Pressed) &&
                       (gamepadState.Buttons.A == ButtonState.Released);
 
-            oldKeyboardState = keyboardState;
-            oldGamePadState = gamepadState;
+            _oldKeyboardState = keyboardState;
+            _oldGamePadState = gamepadState;
 
             return result;
         }
@@ -143,7 +149,7 @@ namespace RockRainEnhanced
         {
             if (CheckEnterA())
             {
-                audio.MenuSelect.Play();
+                _audio.MenuSelect.Play();
 
                 switch (startScene.SelectedMenuIndex)
                 {
@@ -170,16 +176,16 @@ namespace RockRainEnhanced
             GamePadState gamepadState = GamePad.GetState(PlayerIndex.One);
             KeyboardState keyboardState = Keyboard.GetState();
 
-            bool backKey = (oldKeyboardState.IsKeyDown(Keys.Escape) && (keyboardState.IsKeyUp(Keys.Escape)));
-            backKey |= (oldGamePadState.Buttons.Back == ButtonState.Pressed) &&
+            bool backKey = (_oldKeyboardState.IsKeyDown(Keys.Escape) && (keyboardState.IsKeyUp(Keys.Escape)));
+            backKey |= (_oldGamePadState.Buttons.Back == ButtonState.Pressed) &&
                        (gamepadState.Buttons.Back == ButtonState.Released);
 
-            bool enterKey = (oldKeyboardState.IsKeyDown(Keys.Enter) && (keyboardState.IsKeyUp(Keys.Enter)));
-            enterKey |= (oldGamePadState.Buttons.A == ButtonState.Pressed) &&
+            bool enterKey = (_oldKeyboardState.IsKeyDown(Keys.Enter) && (keyboardState.IsKeyUp(Keys.Enter)));
+            enterKey |= (_oldGamePadState.Buttons.A == ButtonState.Pressed) &&
                         (gamepadState.Buttons.A == ButtonState.Released);
 
-            oldKeyboardState = keyboardState;
-            oldGamePadState = gamepadState;
+            _oldKeyboardState = keyboardState;
+            _oldGamePadState = gamepadState;
 
             if (enterKey)
             {
@@ -189,7 +195,7 @@ namespace RockRainEnhanced
                 }
                 else
                 {
-                    audio.MenuBack.Play();
+                    _audio.MenuBack.Play();
                     actionScene.Paused = !actionScene.Paused;
                 }
             }

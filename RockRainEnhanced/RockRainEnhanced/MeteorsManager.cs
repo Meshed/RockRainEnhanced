@@ -20,7 +20,7 @@ namespace RockRainEnhanced
         // List of active meteors
         protected List<Meteor> meteors;
         // Constant for initial meteor count
-        private const int STARTMETEORCOUNT = 10;
+        private const int STARTMETEORCOUNT = 0;
         // Time for new meteor
         private const int ADDMETEORTIME = 5000;
 
