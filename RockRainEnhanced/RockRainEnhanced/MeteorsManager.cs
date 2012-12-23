@@ -1,13 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 
 namespace RockRainEnhanced
@@ -15,13 +9,14 @@ namespace RockRainEnhanced
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class MeteorsManager : Microsoft.Xna.Framework.DrawableGameComponent
+    public class MeteorsManager : DrawableGameComponent
     {
         // List of active meteors
         protected List<Meteor> meteors;
         // Constant for initial meteor count
-        private const int STARTMETEORCOUNT = 0;
+        private const int STARTMETEORCOUNT = 10;
         // Time for new meteor
+        private const int STARTADDMETEORTIME = 1000;
         private const int ADDMETEORTIME = 5000;
 
         protected Texture2D meteorTexture;
@@ -44,24 +39,7 @@ namespace RockRainEnhanced
         {
             meteors.Clear();
 
-            Start();
-
-            for (int i = 0; i < meteors.Count; i++)
-            {
-                meteors[i].Initialize();
-            }
-
             base.Initialize();
-        }
-
-        public void Start()
-        {
-            elapsedTime = TimeSpan.Zero;
-
-            for (int i = 0; i < STARTMETEORCOUNT; i++)
-            {
-                AddNewMeteor();
-            }
         }
 
         public List<Meteor> AllMeteors
@@ -73,17 +51,29 @@ namespace RockRainEnhanced
         {
             elapsedTime += gameTime.ElapsedGameTime;
 
-            if (elapsedTime > TimeSpan.FromMilliseconds(ADDMETEORTIME))
+            if (meteors.Count < STARTMETEORCOUNT)
             {
-                elapsedTime -= TimeSpan.FromMilliseconds(ADDMETEORTIME);
-                AddNewMeteor();
-                audio.NewMeteor.Play();
+                if (elapsedTime > TimeSpan.FromMilliseconds(STARTADDMETEORTIME))
+                {
+                    elapsedTime -= TimeSpan.FromMilliseconds(STARTADDMETEORTIME);
+                    AddNewMeteor();
+                    audio.NewMeteor.Play();
+                }
+            }
+            else
+            {
+                if (elapsedTime > TimeSpan.FromMilliseconds(ADDMETEORTIME))
+                {
+                    elapsedTime -= TimeSpan.FromMilliseconds(ADDMETEORTIME);
+                    AddNewMeteor();
+                    audio.NewMeteor.Play();
+                }
             }
         }
 
         private void AddNewMeteor()
         {
-            Meteor newMeteor = new Meteor(Game, ref meteorTexture);
+            var newMeteor = new Meteor(Game, ref meteorTexture);
             newMeteor.Initialize();
             meteors.Add(newMeteor);
             newMeteor.Index = meteors.Count - 1;
@@ -97,9 +87,9 @@ namespace RockRainEnhanced
         {
             CheckForNewMeteor(gameTime);
 
-            for (int i = 0; i < meteors.Count; i++)
+            foreach (Meteor t in meteors)
             {
-                meteors[i].Update(gameTime);
+                t.Update(gameTime);
             }
 
             base.Update(gameTime);
@@ -107,12 +97,12 @@ namespace RockRainEnhanced
 
         public bool CheckForCollisions(Rectangle rect)
         {
-            for (int i = 0; i < meteors.Count; i++)
+            foreach (Meteor t in meteors)
             {
-                if (meteors[i].CheckCollision(rect))
+                if (t.CheckCollision(rect))
                 {
                     audio.Explosion.Play();
-                    meteors[i].PutinStartPosition();
+                    t.PutinStartPosition();
 
                     return true;
                 }
@@ -123,9 +113,9 @@ namespace RockRainEnhanced
 
         public override void Draw(GameTime gameTime)
         {
-            for (int i = 0; i < meteors.Count; i++)
+            foreach (Meteor t in meteors)
             {
-                meteors[i].Draw(gameTime);
+                t.Draw(gameTime);
             }
 
             base.Draw(gameTime);
