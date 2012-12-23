@@ -23,12 +23,16 @@ namespace RockRainEnhanced.GameScenes
         private readonly PowerSource _powerSource;
         private readonly SimpleRumblePad _rumblePad;
         private readonly ImageComponent _background;
-        private readonly Score _score_player1;
-        private readonly Score _score_player2;
+        private readonly Score _scorePlayer1;
+        private readonly Score _scorePlayer2;
         private Vector2 _pausePosition;
         private Vector2 _gameoverPosition;
         private Rectangle _pauseRect = new Rectangle(1, 120, 200, 44);
         private Rectangle _gameoverRect = new Rectangle(1, 170, 350, 48);
+        private readonly Color _criticalFontColor = Color.Red;
+        private readonly Color _player1FontColor = Color.Blue;
+        private readonly Color _player2FontColor = Color.Green;
+
 #if DEBUG
         TextComponent positionDebugText;
 #endif
@@ -36,10 +40,6 @@ namespace RockRainEnhanced.GameScenes
         private bool _gameOver;
         private TimeSpan _elapsedTime = TimeSpan.Zero;
         private bool _twoPlayers;
-        protected Vector2 pausePosition;
-        protected Vector2 gameoverPosition;
-        protected Rectangle pauseRect = new Rectangle(1, 120, 200, 44);
-        protected Rectangle gameoverRect = new Rectangle(1, 170, 350, 48);
 
         Game1 game1;
         Texture2D actionElementsTexture;
@@ -64,11 +64,10 @@ namespace RockRainEnhanced.GameScenes
             this.actionElementsTexture = actionElementsTexture;
             this.actionBackgroundTexture = actionBackgroundTexture;
             this.scoreFont = font;
-          
             
-            _score_player1 = new Score(game, font, Color.Blue);
-            _score_player1.Position = new Vector2(10, 10);
-            Components.Add(_score_player1);
+            _scorePlayer1 = new Score(game, font, _player1FontColor);
+            _scorePlayer1.Position = new Vector2(10, 10);
+            Components.Add(_scorePlayer1);
            
 
             _rumblePad = new SimpleRumblePad(game);
@@ -77,10 +76,10 @@ namespace RockRainEnhanced.GameScenes
             _powerSource = new PowerSource(game, ref _actionTexture);
             _powerSource.Initialize();
             Components.Add(_powerSource);
+
 #if DEBUG
             positionDebugText=new TextComponent(game,this.scoreFont,new Vector2(),Color.Red);
-            Components.Add(positionDebugText);
-            
+            Components.Add(positionDebugText);            
 #endif
         }
         public ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font,Rectangle screenBounds, params IController[] controllers)
@@ -100,9 +99,9 @@ namespace RockRainEnhanced.GameScenes
             _player1.Initialize();
             Components.Add(_player1);
 
-            _score_player2 = new Score(game, font, Color.Red);
-            _score_player2.Position = new Vector2(Game.Window.ClientBounds.Width - 200, 10);
-            Components.Add(_score_player2);
+            _scorePlayer2 = new Score(game, font, _player2FontColor);
+            _scorePlayer2.Position = new Vector2(Game.Window.ClientBounds.Width - 200, 10);
+            Components.Add(_scorePlayer2);
             _player2 = new Player(Game, ref _actionTexture, new Vector2((int)(screenBounds.Width / 1.5), 0), new Rectangle(360, 17, 30, 30), playerTwoController);
             _player2.Initialize();
             Components.Add(_player2);
@@ -152,10 +151,10 @@ namespace RockRainEnhanced.GameScenes
                 _player2.Reset();
                 _player2.Visible = _twoPlayers;
                 _player2.Enabled = _twoPlayers;
-                _score_player2.Visible = _twoPlayers;
-                _score_player2.Enabled = _twoPlayers;
-                _score_player2.Visible = _twoPlayers;
-                _score_player2.Enabled = _twoPlayers;
+                _scorePlayer2.Visible = _twoPlayers;
+                _scorePlayer2.Enabled = _twoPlayers;
+                _scorePlayer2.Visible = _twoPlayers;
+                _scorePlayer2.Enabled = _twoPlayers;
             }
             
             _paused = false;
@@ -204,12 +203,15 @@ namespace RockRainEnhanced.GameScenes
                 HandlePowerSourceSprite(gameTime);
 
                 // Update score
-                _score_player1.Value = _player1.Score;
-                _score_player1.Power = _player1.Power;
+                _scorePlayer1.Value = _player1.Score;
+                _scorePlayer1.Power = _player1.Power;
+                _scorePlayer1.PowerFontColor = _scorePlayer1.Power <= 30 ? _criticalFontColor : _player1FontColor;
+
                 if (_twoPlayers)
                 {
-                    _score_player2.Value = _player2.Score;
-                    _score_player2.Power = _player2.Power;
+                    _scorePlayer2.Value = _player2.Score;
+                    _scorePlayer2.Power = _player2.Power;
+                    _scorePlayer2.PowerFontColor = _scorePlayer2.Power <= 30 ? _criticalFontColor : _player2FontColor;
                 }
 
                 // Check if player is dead

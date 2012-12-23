@@ -1,55 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace RockRainEnhanced
 {
     public class Score : DrawableGameComponent
     {
-        protected SpriteBatch spriteBatch = null;
-        protected Vector2 position = new Vector2();
-        protected int value;
-        protected int power;
-        protected readonly SpriteFont font;
-        protected readonly Color fontColor;
+        readonly SpriteBatch _spriteBatch;
+        Vector2 _position;
+        int _value;
+        int _power;
+        readonly SpriteFont _font;
+        private Color _fontColor;
 
         public int Value
         {
-            get { return value; }
-            set { this.value = value; }
+            get { return _value; }
+            set { _value = value; }
         }
         public int Power
         {
-            get { return power; }
-            set { power = value; }
+            get { return _power; }
+            set { _power = value; }
         }
         public Vector2 Position
         {
-            get { return position; }
-            set { position = value; }
+            get { return _position; }
+            set { _position = value; }
         }
+
+        public Color FontColor
+        {
+            get { return _fontColor; }
+            set { _fontColor = value; }
+        }
+
+        public Color ValueFontColor { get; set; }
+        public Color PowerFontColor { get; set; }
 
         public Score(Game game, SpriteFont font, Color fontColor) : base(game)
         {
-            this.font = font;
-            this.fontColor = fontColor;
-            spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
+            _font = font;
+            _fontColor = fontColor;
+            ValueFontColor = fontColor;
+            _spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
         }
 
         public override void Draw(GameTime gameTime)
         {
-            string textToDraw = string.Format("Score: {0}", value);
+            string textToDraw = string.Format("Score: {0}", _value);
 
-            spriteBatch.DrawString(font, textToDraw, new Vector2(position.X + 1, position.Y + 1), Color.Black);
-            spriteBatch.DrawString(font, textToDraw, new Vector2(position.X, position.Y), fontColor);
+            _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X + 1, _position.Y + 1), Color.Black);
+            _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X, _position.Y), ValueFontColor);
 
-            float height = font.MeasureString(textToDraw).Y;
-            textToDraw = string.Format("Power: {0}", power);
-            spriteBatch.DrawString(font, textToDraw, new Vector2(position.X + 1, position.Y + 1 + height), Color.Black);
-            spriteBatch.DrawString(font, textToDraw, new Vector2(position.X, position.Y + height), fontColor);
+            float height = _font.MeasureString(textToDraw).Y;
+            textToDraw = string.Format("Power: {0}", _power);
+            _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X + 1, _position.Y + 1 + height), Color.Black);
+            _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X, _position.Y + height), PowerFontColor);
 
             base.Draw(gameTime);
         }
