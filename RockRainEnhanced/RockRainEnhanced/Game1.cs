@@ -19,9 +19,9 @@ namespace RockRainEnhanced
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager _graphics;
-        SpriteBatch _spriteBatch;
-        protected AudioLibrary _audio;
+        readonly GraphicsDeviceManager _graphics;
+        readonly SpriteBatch _spriteBatch;
+        readonly  AudioLibrary _audio;
 
         // Game scenes
         HelpScene _helpScene;
@@ -36,10 +36,10 @@ namespace RockRainEnhanced
         protected Texture2D actionElementsTexture, actionBackgroundTexture;
 
         // Fonts
-        private SpriteFont smallFont, largeFont, scoreFont;
+        SpriteFont smallFont, largeFont, scoreFont;
 
         protected KeyboardState oldKeyboardState;
-        protected GamePadState oldGamePadState;
+        //protected GamePadState oldGamePadState;
 
         HashSet<IController> menuControllers = new HashSet<IController>()
         {          
@@ -54,11 +54,11 @@ namespace RockRainEnhanced
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-
+            _audio = new AudioLibrary();
             _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
 
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
             //graphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
 
@@ -80,10 +80,10 @@ namespace RockRainEnhanced
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
             Services.AddService(typeof(SpriteBatch), _spriteBatch);
 
-            _audio = new AudioLibrary();
+            
             _audio.LoadContent(this.Content);
             Services.AddService(typeof(AudioLibrary), _audio);
 
@@ -223,21 +223,8 @@ namespace RockRainEnhanced
 
         private void HandleActionInput()
         {
-            var gamepadState = GamePad.GetState(PlayerIndex.One);
-            var keyboardState = Keyboard.GetState();
-
-            bool backKey = (oldKeyboardState.IsKeyDown(Keys.Escape) && (keyboardState.IsKeyUp(Keys.Escape)));
-            backKey |= (oldGamePadState.Buttons.Back == ButtonState.Pressed) &&
-                       (gamepadState.Buttons.Back == ButtonState.Released);
-
-            bool enterKey = (oldKeyboardState.IsKeyDown(Keys.Enter) && (keyboardState.IsKeyUp(Keys.Enter)));
-            enterKey |= (oldGamePadState.Buttons.A == ButtonState.Pressed) &&
-                        (gamepadState.Buttons.A == ButtonState.Released);
-
-            oldKeyboardState = keyboardState;
-            oldGamePadState = gamepadState;
-
-            if (enterKey)
+            
+            if ((_joinScene.PlayerOne != null && _joinScene.PlayerOne.IsEnter) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsEnter))
             {
                 if (_actionScene.GameOver)
                 {
@@ -250,7 +237,7 @@ namespace RockRainEnhanced
                 }
             }
 
-            if (backKey)
+            if ((_joinScene.PlayerOne!= null && _joinScene.PlayerOne.IsBack ) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsBack))
             {
                 ShowScene(_startScene);
             }
