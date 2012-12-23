@@ -20,7 +20,7 @@ namespace RockRainEnhanced
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         readonly GraphicsDeviceManager _graphics;
-        readonly SpriteBatch _spriteBatch;
+        SpriteBatch _spriteBatch;
         readonly  AudioLibrary _audio;
 
         // Game scenes
@@ -58,7 +58,7 @@ namespace RockRainEnhanced
             _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
 
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
             //graphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
 
@@ -80,7 +80,7 @@ namespace RockRainEnhanced
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            
+            _spriteBatch = new SpriteBatch(_graphics.GraphicsDevice);
             Services.AddService(typeof(SpriteBatch), _spriteBatch);
 
             
@@ -112,7 +112,8 @@ namespace RockRainEnhanced
         ActionScene SetUpActionScene2(IController controllerOne, IController controllerTwo)
         {
             Components.OfType<ActionScene>().ToList().ForEach(a => { Components.Remove(a); a.Dispose(); });
-            _actionScene = new ActionScene(this, actionElementsTexture, actionBackgroundTexture, scoreFont, this.GetScreenBounds(), controllerOne, controllerTwo);
+            _actionScene = new ActionScene(controllerOne, controllerTwo,this, actionElementsTexture,
+                actionBackgroundTexture, this.GetScreenBounds(),scoreFont);
             Components.Add(_actionScene);
             return _actionScene;
         }

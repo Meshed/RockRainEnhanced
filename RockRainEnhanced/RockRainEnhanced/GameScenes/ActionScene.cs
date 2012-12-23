@@ -84,6 +84,7 @@ namespace RockRainEnhanced.GameScenes
 #if DEBUG
             positionDebugText=new TextComponent(game,this.scoreFont,new Vector2(),Color.Red);
             Components.Add(positionDebugText);
+            
 #endif
         }
         public ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font,Rectangle screenBounds, params IController[] controllers)
@@ -149,8 +150,9 @@ namespace RockRainEnhanced.GameScenes
             powerSource.PutinStartPosition();
 
             player1.Reset();
-            if (player2 != null)
+            if (twoPlayers)
             {
+                
                 player2.Reset();
                 player2.Visible = twoPlayers;
                 player2.Enabled = twoPlayers;
@@ -226,7 +228,7 @@ namespace RockRainEnhanced.GameScenes
             {
                 meteors.Update(gameTime);
             }
-            positionDebugText.Text = player1.GetBounds().ToString();
+            positionDebugText.Text = player2.GetBounds().ToString();
         }
 
         private void HandleDamages()
