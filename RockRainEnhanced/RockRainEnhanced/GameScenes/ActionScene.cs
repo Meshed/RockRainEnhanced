@@ -116,8 +116,8 @@ namespace RockRainEnhanced.GameScenes
             _player2.Reset();
 
             _paused = false;
-            _pausePosition.X = (Game.Window.ClientBounds.Width - _pauseRect.Width/2);
-            _pausePosition.Y = (Game.Window.ClientBounds.Height - _pauseRect.Height/2);
+            _pausePosition.X = (Game.Window.ClientBounds.Width - _pauseRect.Width)/2;
+            _pausePosition.Y = (Game.Window.ClientBounds.Height - _pauseRect.Height)/2;
 
             _player2.Visible = _twoPlayers;
             _player2.Enabled = _twoPlayers;
