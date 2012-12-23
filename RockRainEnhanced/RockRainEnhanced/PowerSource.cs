@@ -18,13 +18,20 @@ namespace RockRainEnhanced
     /// </summary>
     public class PowerSource : Sprite
     {
-        protected Texture2D texture;
-        protected Random random;
+        protected Texture2D Texture;
+        protected Random Random;
+        private int _powerValue = 50;
+
+        public int PowerValue
+        {
+            get { return _powerValue; }
+            set { _powerValue = value; }
+        }
 
         public PowerSource(Game game, ref Texture2D theTexture)
             : base(game, ref theTexture)
         {
-            texture = theTexture;
+            Texture = theTexture;
 
             Frames = new List<Rectangle>();
             Rectangle frame = new Rectangle();
@@ -50,13 +57,13 @@ namespace RockRainEnhanced
             Frames.Add(frame);
 
             frameDelay = 200;
-            random = new Random(GetHashCode());
+            Random = new Random(GetHashCode());
             PutinStartPosition();
         }
 
         public void PutinStartPosition()
         {
-            position.X = random.Next(Game.Window.ClientBounds.Width - currentFrame.Width);
+            position.X = Random.Next(Game.Window.ClientBounds.Width - currentFrame.Width);
             position.Y = -10;
             Enabled = false;
         }
