@@ -272,6 +272,23 @@ namespace RockRainEnhanced.GameScenes
                     if (_player1.Position.X < _player2.Position.X)
                     {
                         _player1.StopLeft(_player2.Position.X);
+                        _player2.StopRight(_player1.Position.X);
+                    }
+                    else
+                    {
+                        _player1.StopRight(_player2.Position.X);
+                        _player2.StopLeft(_player1.Position.X);
+                    }
+
+                    if (_player1.Position.Y < _player2.Position.Y)
+                    {
+                        _player1.StopDown(_player2.Position.Y);
+                        _player2.StopUp(_player1.Position.Y);
+                    }
+                    else
+                    {
+                        _player1.StopUp(_player2.Position.Y);
+                        _player2.StopDown(_player1.Position.Y);
                     }
                 }
             }

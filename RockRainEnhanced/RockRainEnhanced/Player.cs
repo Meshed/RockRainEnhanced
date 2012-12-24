@@ -39,6 +39,7 @@ namespace RockRainEnhanced
         }
         public int Power { get; set; }
         private bool StopX { get; set; }
+        private bool StopY { get; set; }
 
         public Player(Game game, ref Texture2D theTexture, Vector2 initialPosition, Rectangle rectangle, params IController[] controllers)
             : base(game)
@@ -74,9 +75,14 @@ namespace RockRainEnhanced
                 StopX = false;                
             }
 
-            _position.Y += (_controllers.MaxBy(c=>Math.Abs(c.YThrottle)).YThrottle *3)*-2;
-
-           
+            if (!StopY)
+            {
+                _position.Y += (_controllers.MaxBy(c => Math.Abs(c.YThrottle)).YThrottle * 3) * -2;
+            }
+            else
+            {
+                StopY = false;
+            }           
 
             KeepInBound();
 
@@ -181,9 +187,20 @@ namespace RockRainEnhanced
             _position.X -= 1;
             StopX = true;
         }
-        public void StopRight()
+        public void StopRight(float otherPlayerX)
         {
             _position.X += 1;
+            StopX = true;
+        }
+        public void StopUp(float otherPlayerY)
+        {
+            _position.Y += 1;
+            StopY = true;
+        }
+        public void StopDown(float otherPlayerY)
+        {
+            _position.Y -= 1;
+            StopY = true;
         }
     }
 }
