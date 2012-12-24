@@ -221,7 +221,7 @@ namespace RockRainEnhanced.GameScenes
                     _player1.Visible = (_player1.Power > 0);
                     if (_twoPlayers)
                     {
-                        _player2.Visible = (_player2.Power > 0);
+                        if (_player2 != null) _player2.Visible = (_player2.Power > 0);
                     }
                     MediaPlayer.Stop();
                 }
@@ -267,17 +267,6 @@ namespace RockRainEnhanced.GameScenes
                     _player2.Score -= 10;
                 }
             }
-            var q = from m1 in _meteors.AllMeteors
-                    from m2 in _meteors.AllMeteors
-                    where m1 != m2
-                    where m1.CheckCollision(m2)
-                    select new { m1, m2 };
-            foreach (var m in q.ToArray())
-            {
-                _meteors.AllMeteors.Remove(m.m1);
-                _meteors.AllMeteors.Remove(m.m2);
-                _audio.Explosion.Play();
-            }
         }
 
         private void HandlePowerSourceSprite(GameTime gameTime)
@@ -293,6 +282,11 @@ namespace RockRainEnhanced.GameScenes
                 {
                     _player1.Power = 100;
                 }
+
+                if (_player1.Power < 0)
+                {
+                    _player1.Power = 0;
+                }
             }
 
             if (_twoPlayers)
@@ -306,6 +300,11 @@ namespace RockRainEnhanced.GameScenes
                     if (_player2.Power > 100)
                     {
                         _player2.Power = 100;
+                    }
+
+                    if (_player2.Power < 0)
+                    {
+                        _player2.Power = 0;
                     }
                 }
             }

@@ -114,6 +114,7 @@ namespace RockRainEnhanced
         {
             // Check if the meteor is still visible
             if ((position.Y >= Game.Window.ClientBounds.Height) ||
+                (position.Y < 0) ||
                 (position.X >= Game.Window.ClientBounds.Width) ||
                 (position.X <= 0))
             {
@@ -137,6 +138,23 @@ namespace RockRainEnhanced
         {
             Rectangle spriteRect = new Rectangle((int) position.X, (int) position.Y, currentFrame.Width, currentFrame.Height);
             return spriteRect.Intersects(rect);
+        }
+
+        public void Bounce(Meteor meteor)
+        {
+            XSpeed = XSpeed*-1;
+            YSpeed = YSpeed*-1;
+
+            if (position.X < meteor.position.X)
+            {
+                // Left
+                position.X = meteor.position.X - currentFrame.Width;
+            }
+            else
+            {
+                // Right
+                position.X = meteor.position.X + meteor.currentFrame.Width;
+            }
         }
     }
 }

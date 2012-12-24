@@ -85,6 +85,8 @@ namespace RockRainEnhanced
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
+            BounceMeteors();
+
             CheckForNewMeteor(gameTime);
 
             foreach (Meteor t in meteors)
@@ -93,6 +95,23 @@ namespace RockRainEnhanced
             }
 
             base.Update(gameTime);
+        }
+
+        private void BounceMeteors()
+        {
+            foreach (Meteor currentMeteor in meteors)
+            {
+                foreach (Meteor meteor in meteors)
+                {
+                    if (currentMeteor != meteor)
+                    {
+                        if (currentMeteor.CheckCollision(meteor))
+                        {
+                            currentMeteor.Bounce(meteor);
+                        }
+                    }
+                }
+            }
         }
 
         public bool CheckForCollisions(Rectangle rect)
