@@ -21,6 +21,7 @@ namespace RockRainEnhanced.GameScenes
         private readonly Player _player2;
         private readonly MeteorsManager _meteors;
         private readonly PowerSource _powerSource;
+        private readonly Wrench _wrench;
         private readonly SimpleRumblePad _rumblePad;
         private readonly ImageComponent _background;
         private readonly Score _scorePlayer1;
@@ -32,20 +33,21 @@ namespace RockRainEnhanced.GameScenes
         private readonly Color _criticalFontColor = Color.Red;
         private readonly Color _player1FontColor = Color.Blue;
         private readonly Color _player2FontColor = Color.Green;
-
-#if DEBUG
-        TextComponent positionDebugText;
-#endif
         private bool _paused;
         private bool _gameOver;
         private TimeSpan _elapsedTime = TimeSpan.Zero;
+        private TimeSpan _wrenchElapsedTime = TimeSpan.Zero;
         private bool _twoPlayers;
-
         Game1 game1;
         Texture2D actionElementsTexture;
         Texture2D actionBackgroundTexture;
         SpriteFont scoreFont;
         IController[] controllers;
+
+#if DEBUG
+        TextComponent positionDebugText;
+#endif
+
         ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font):base(game)
         {
             _audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
@@ -76,6 +78,10 @@ namespace RockRainEnhanced.GameScenes
             _powerSource = new PowerSource(game, ref _actionTexture);
             _powerSource.Initialize();
             Components.Add(_powerSource);
+
+            _wrench = new Wrench(game, game.Content.Load<Texture2D>("wrench"));
+            _wrench.Initialize();
+            Components.Add(_wrench);
 
 #if DEBUG
             positionDebugText=new TextComponent(game,this.scoreFont,new Vector2(),Color.Red);
@@ -143,6 +149,7 @@ namespace RockRainEnhanced.GameScenes
             MediaPlayer.Play(_audio.BackMusic);
             _meteors.Initialize();
             _powerSource.PutinStartPosition();
+            _wrench.PutinStartPosition();
 
             _player1.Reset();
             if (_twoPlayers)
@@ -201,6 +208,7 @@ namespace RockRainEnhanced.GameScenes
                 HandleDamages();
 
                 HandlePowerSourceSprite(gameTime);
+                HandleWrenchSprite(gameTime);
 
                 // Update score
                 _scorePlayer1.Value = _player1.Score;
@@ -276,7 +284,7 @@ namespace RockRainEnhanced.GameScenes
                 _audio.PowerGet.Play();
                 _elapsedTime = TimeSpan.Zero;
                 _powerSource.PutinStartPosition();
-                _player1.Power += _powerSource.PowerValue;
+                _player1.Power += _powerSource.EffectValue;
 
                 if (_player1.Power > 100)
                 {
@@ -295,7 +303,7 @@ namespace RockRainEnhanced.GameScenes
                 {
                     _audio.PowerGet.Play();
                     _powerSource.PutinStartPosition();
-                    _player2.Power += _powerSource.PowerValue;
+                    _player2.Power += _powerSource.EffectValue;
 
                     if (_player2.Power > 100)
                     {
@@ -311,10 +319,66 @@ namespace RockRainEnhanced.GameScenes
 
             // Check for sending a new power source
             _elapsedTime += gameTime.ElapsedGameTime;
-            if (_elapsedTime > TimeSpan.FromSeconds(15))
+            if (_elapsedTime > TimeSpan.FromSeconds(10))
             {
-                _elapsedTime -= TimeSpan.FromSeconds(15);
+                _elapsedTime -= TimeSpan.FromSeconds(10);
                 _powerSource.Enabled = true;
+            }
+        }
+        private void HandleWrenchSprite(GameTime gameTime)
+        {
+            if (_wrench.CheckCollision(_player1.GetBounds()))
+            {
+                _audio.PowerGet.Play();
+                _wrenchElapsedTime = TimeSpan.Zero;
+                _wrench.PutinStartPosition();
+                _player1.PowerLossPerSecond -= _wrench.EffectValue;
+                if (_player1.PowerLossPerSecond < 1)
+                {
+                    _player1.PowerLossPerSecond = 1;
+                }
+
+                if (_player1.Power > 100)
+                {
+                    _player1.Power = 100;
+                }
+
+                if (_player1.Power < 0)
+                {
+                    _player1.Power = 0;
+                }
+            }
+
+            if (_twoPlayers)
+            {
+                if (_wrench.CheckCollision(_player2.GetBounds()))
+                {
+                    _audio.PowerGet.Play();
+                    _wrench.PutinStartPosition();
+                    _player2.PowerLossPerSecond -= _wrench.EffectValue;
+                    if (_player2.PowerLossPerSecond < 1)
+                    {
+                        _player2.PowerLossPerSecond = 1;
+                    }
+
+                    if (_player2.Power > 100)
+                    {
+                        _player2.Power = 100;
+                    }
+
+                    if (_player2.Power < 0)
+                    {
+                        _player2.Power = 0;
+                    }
+                }
+            }
+
+            // Check for sending a new wrench
+            _wrenchElapsedTime += gameTime.ElapsedGameTime;
+            if (_wrenchElapsedTime > TimeSpan.FromSeconds(15))
+            {
+                _wrenchElapsedTime -= TimeSpan.FromSeconds(15);
+                _wrench.Enabled = true;
             }
         }
 

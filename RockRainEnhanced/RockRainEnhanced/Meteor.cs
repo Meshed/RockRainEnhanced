@@ -114,11 +114,14 @@ namespace RockRainEnhanced
         {
             // Check if the meteor is still visible
             if ((position.Y >= Game.Window.ClientBounds.Height) ||
-                (position.Y < 0) ||
                 (position.X >= Game.Window.ClientBounds.Width) ||
                 (position.X <= 0))
             {
                 PutinStartPosition();
+            }
+            if (position.Y < 0)
+            {
+                YSpeed = YSpeed*-1;
             }
 
             // Move meteor

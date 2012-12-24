@@ -16,38 +16,23 @@ namespace RockRainEnhanced
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class PowerSource : PowerUp
+    public class Wrench : PowerUp
     {
-        public PowerSource(Game game, ref Texture2D theTexture)
-            : base(game, ref theTexture)
+        public Wrench(Game game, Texture2D texture)
+            : base(game, ref texture)
         {
             Frames = new List<Rectangle>();
             Rectangle frame = new Rectangle();
-            frame.X = 291;
-            frame.Y = 17;
-            frame.Width = 14;
-            frame.Height = 12;
+
+            frame.X = 0;
+            frame.Y = 0;
+            frame.Width = texture.Width;
+            frame.Height = texture.Height;
             Frames.Add(frame);
 
-            frame.Y = 30;
-            Frames.Add(frame);
-
-            frame.Y = 43;
-            Frames.Add(frame);
-
-            frame.Y = 57;
-            Frames.Add(frame);
-
-            frame.Y = 70;
-            Frames.Add(frame);
-
-            frame.Y = 82;
-            Frames.Add(frame);
-
-            frameDelay = 200;
             Random = new Random(GetHashCode());
             PutinStartPosition();
-            EffectValue = 25;
+            EffectValue = 2;
         }
 
         /// <summary>
@@ -67,6 +52,8 @@ namespace RockRainEnhanced
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
+            // TODO: Add your update code here
+
             base.Update(gameTime);
         }
     }

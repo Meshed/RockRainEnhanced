@@ -18,7 +18,7 @@ namespace RockRainEnhanced.Core
     public class Sprite : Microsoft.Xna.Framework.DrawableGameComponent
     {
         private int activeFrame;
-        private readonly Texture2D texture;
+        protected readonly Texture2D texture;
         private List<Rectangle> frames;
 
         protected Vector2 position;
