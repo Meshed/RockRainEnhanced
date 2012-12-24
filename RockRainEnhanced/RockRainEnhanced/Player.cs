@@ -18,13 +18,27 @@ namespace RockRainEnhanced
         Rectangle _spriteRectangle;
         Vector2 _position;
         TimeSpan _elapsedTime = TimeSpan.Zero;
-        
         int _score;
         const int InitialPower = 100;
         const int Velocity = 5;
         IEnumerable<IController> _controllers;
         Vector2 _initialPosition;
+
         public int PowerLossPerSecond { get; set; }
+        public int Score
+        {
+            get { return _score; }
+            set
+            {
+                _score = value < 0 ? 0 : value;
+            }
+        }
+        public Vector2 Position
+        {
+            get { return _position; }
+        }
+        public int Power { get; set; }
+        private bool StopX { get; set; }
 
         public Player(Game game, ref Texture2D theTexture, Vector2 initialPosition, Rectangle rectangle, params IController[] controllers)
             : base(game)
@@ -45,35 +59,22 @@ namespace RockRainEnhanced
             PowerLossPerSecond = 1;
         }
 
-        public void Reset()
-        {
-           
-            _position = _initialPosition;
-            _position.Y = this.Game.GetScreenBounds().Height - _spriteRectangle.Height;
-            _score = 0;
-            Power = InitialPower;
-            KeepInBound();
-        }
-
-        public int Score
-        {
-            get { return _score; }
-            set {
-                _score = value < 0 ? 0 : value;
-            }
-        }
-
-        public int Power { get; set; }
-
         /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            
+            if (!StopX)
+            {
+                _position.X += (_controllers.MaxBy(c => Math.Abs(c.XThrottle)).XThrottle * 3) * 2;
+            }
+            else
+            {
+                StopX = false;                
+            }
+
             _position.Y += (_controllers.MaxBy(c=>Math.Abs(c.YThrottle)).YThrottle *3)*-2;
-            _position.X += (_controllers.MaxBy(c=>Math.Abs(c.XThrottle)).XThrottle *3)*2;
 
            
 
@@ -91,7 +92,23 @@ namespace RockRainEnhanced
 
             base.Update(gameTime);
         }
+        public override void Draw(GameTime gameTime)
+        {
+            var sBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
 
+            sBatch.Draw(_texture, _position, _spriteRectangle, Color.White);
+
+            base.Draw(gameTime);
+        }
+
+        public void Reset()
+        {
+            _position = _initialPosition;
+            _position.Y = this.Game.GetScreenBounds().Height - _spriteRectangle.Height;
+            _score = 0;
+            Power = InitialPower;
+            KeepInBound();
+        }
         private void KeepInBound()
         {
             var screenBounds=this.Game.GetScreenBounds();
@@ -114,7 +131,6 @@ namespace RockRainEnhanced
                 _position.Y = screenBounds.Height - _spriteRectangle.Height;
             }
         }
-
         private void HandlePlayer1KeyBoard()
         {
             KeyboardState keyboard = Keyboard.GetState();
@@ -135,7 +151,6 @@ namespace RockRainEnhanced
                 _position.X += Velocity;
             }
         }
-
         private void HandlePlayer2KeyBoard()
         {
             KeyboardState keyboard = Keyboard.GetState();
@@ -157,19 +172,18 @@ namespace RockRainEnhanced
                 _position.X += Velocity;
             }
         }
-
-        public override void Draw(GameTime gameTime)
-        {
-            var sBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
-
-            sBatch.Draw(_texture, _position, _spriteRectangle, Color.White);
-
-            base.Draw(gameTime);
-        }
-
         public Rectangle GetBounds()
         {
             return new Rectangle((int) _position.X, (int) _position.Y, _spriteRectangle.Width, _spriteRectangle.Height);
+        }
+        public void StopLeft(float otherPlayerX)
+        {
+            _position.X -= 1;
+            StopX = true;
+        }
+        public void StopRight()
+        {
+            _position.X += 1;
         }
     }
 }

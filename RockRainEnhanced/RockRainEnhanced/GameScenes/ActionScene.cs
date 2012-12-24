@@ -263,16 +263,16 @@ namespace RockRainEnhanced.GameScenes
                 {
                     _player2.Power -= 10;
                     _player2.PowerLossPerSecond++;
-                    _player2.Score -= 10;
+                    _player2.Score -= 1;
                 }
 
                 // Check for collision between players
                 if (_player1.GetBounds().Intersects(_player2.GetBounds()))
                 {
-                    _player1.Power -= 10;
-                    _player1.Score -= 10;
-                    _player2.Power -= 10;
-                    _player2.Score -= 10;
+                    if (_player1.Position.X < _player2.Position.X)
+                    {
+                        _player1.StopLeft(_player2.Position.X);
+                    }
                 }
             }
         }
