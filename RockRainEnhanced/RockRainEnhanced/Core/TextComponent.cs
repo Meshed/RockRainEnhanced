@@ -36,8 +36,6 @@ namespace RockRainEnhanced.Core
         {
             float y = _position.Y;
 
-            Color theColor;
-
             // Draw the text shadow
             _spriteBatch.DrawString(_font, Text ?? string.Empty, new Vector2(_position.X + 1, y + 1), Color.Black);
             // Draw the text item

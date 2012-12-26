@@ -12,23 +12,34 @@ namespace RockRainEnhanced.GameScenes
     using System.Text;
 
     using Microsoft.Xna.Framework;
+    using Microsoft.Xna.Framework.Graphics;
 
     using RockRainEnhanced.ControllerStrategy;
+    using RockRainEnhanced.Core;
 
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
     public class ScoreScene : GameScene
     {
-        private readonly IDictionary<int, string> _highScores;
+        private readonly IDictionary<int, Tuple<string, TextComponent, IController>> _highScores =
+            new Dictionary<int, Tuple<string, TextComponent, IController>>();
 
         private readonly IList<Tuple<int, IController, string>> _playerEntries;
 
         public bool AcceptingInput { get; private set; }
-        public ScoreScene(Game game, IDictionary<int, string> highScores, params Tuple<int, IController>[] playerScores)
+
+        public ScoreScene(
+            Game game,
+            SpriteFont font,
+            IDictionary<int, string> highScores,
+            Texture2D background,
+            params Tuple<int, IController>[] playerScores)
             : base(game)
         {
-            _highScores = highScores;
+            Components.Add(new ImageComponent(game, background, ImageComponent.DrawMode.Center));
+            Components.ToList().ForEach(c => c.Enabled = true);
+            
             if (highScores.Count < 10 || playerScores.Any(ps => highScores.Keys.Any(k => k < ps.Item1)))
             {
                 AcceptingInput = true;
@@ -39,8 +50,30 @@ namespace RockRainEnhanced.GameScenes
                 {
                     _highScores.Remove(r);
                 }
-                _playerEntries = playerScores.OrderByDescending(ps => ps.Item1).Take(highCount).Select(ps=>Tuple.Create(ps.Item1,ps.Item2,string.Empty)).ToList();
+                _playerEntries =
+                    playerScores.OrderByDescending(ps => ps.Item1)
+                                .Take(highCount)
+                                .Select(ps => Tuple.Create(ps.Item1, ps.Item2, string.Empty))
+                                .ToList();
+                foreach (var pe in _playerEntries)
+                {
+                    highScores.Add(pe.Item1, pe.Item3);
+                }
             }
+            var y = 100;
+            foreach (var hs in highScores)
+            {
+                var component = new TextComponent(game, font, new Vector2(100, y), Color.Wheat)
+                                    {
+                                        Visible = true,
+                                        Enabled = true
+                                    };
+                var playerScore = playerScores.LastOrDefault(ps => hs.Key == ps.Item1);
+                var controller = playerScore != null ? playerScore.Item2 : null;
+                Components.Add(component);
+                _highScores.Add(hs.Key, Tuple.Create(string.Empty, component, controller));
+            }
+
         }
 
         public override void Update(GameTime gameTime)
@@ -49,10 +82,11 @@ namespace RockRainEnhanced.GameScenes
             {
                 foreach (var pe in _playerEntries.Where(p => p.Item2.IsEnter).ToArray())
                 {
-                    _highScores.Add(pe.Item1, pe.Item3);
-                    _playerEntries.Remove(pe);
+                    //_highScores.Add(pe.Item1, pe.Item3);
+                    //_playerEntries.Remove(pe);
                 }
             }
+
             base.Update(gameTime);
 
         }
