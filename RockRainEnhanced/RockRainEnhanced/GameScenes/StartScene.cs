@@ -42,8 +42,8 @@ namespace RockRainEnhanced.GameScenes
             menu.SetMenuItems(items);
             Components.Add(menu);
 
-            spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
-            audio = (AudioLibrary) Game.Services.GetService(typeof (AudioLibrary));
+            spriteBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
+            audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace RockRainEnhanced.GameScenes
         public override void Show()
         {
             audio.NewMeteor.Play();
-            rockPosition.X = -1*rockRect.Width;
+            rockPosition.X = -1 * rockRect.Width;
             rockPosition.Y = 40;
             rainPosition.X = Game.Window.ClientBounds.Width;
             rainPosition.Y = 180;

@@ -25,7 +25,7 @@ namespace RockRainEnhanced.ControllerStrategy
          public ArrowController(PlayerIndex index)
         {
             _index = index;
-            XSensitivity = 1;
+            XSensitivity = -1;
             YSensitivity = 1;
             _controllerCommon = new ControllerCommon<KeyboardState, Keys>((ks, k) => ks.IsKeyDown(k), (ks, k) => ks.IsKeyUp(k),  () => Keyboard.GetState(_index));
             UseContinuous = true;

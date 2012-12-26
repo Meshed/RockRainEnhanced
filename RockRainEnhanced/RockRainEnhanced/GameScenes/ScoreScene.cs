@@ -37,8 +37,10 @@ namespace RockRainEnhanced.GameScenes
             params Tuple<int, IController>[] playerScores)
             : base(game)
         {
-            Components.Add(new ImageComponent(game, background, ImageComponent.DrawMode.Center));
-            Components.ToList().ForEach(c => c.Enabled = true);
+            var backgroundComponent = new ImageComponent(game, background, ImageComponent.DrawMode.Center);
+
+            Components.Add(backgroundComponent);
+            
             
             if (highScores.Count < 10 || playerScores.Any(ps => highScores.Keys.Any(k => k < ps.Item1)))
             {
@@ -61,19 +63,22 @@ namespace RockRainEnhanced.GameScenes
                 }
             }
             var y = 100;
-            foreach (var hs in highScores)
+            foreach (var hs in highScores.OrderByDescending(x => x.Key))
             {
-                var component = new TextComponent(game, font, new Vector2(100, y), Color.Wheat)
+                var component = new TextComponent(game, font, new Vector2(100, y), Color.White)
                                     {
                                         Visible = true,
-                                        Enabled = true
+                                        Enabled = true,
+                                        Text = hs.Value +"   "+ hs.Key
                                     };
+                
                 var playerScore = playerScores.LastOrDefault(ps => hs.Key == ps.Item1);
                 var controller = playerScore != null ? playerScore.Item2 : null;
                 Components.Add(component);
                 _highScores.Add(hs.Key, Tuple.Create(string.Empty, component, controller));
+                y += 100;
             }
-
+            
         }
 
         public override void Update(GameTime gameTime)
