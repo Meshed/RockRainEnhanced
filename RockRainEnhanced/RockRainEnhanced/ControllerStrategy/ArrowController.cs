@@ -41,7 +41,7 @@ namespace RockRainEnhanced.ControllerStrategy
        
         public bool IsEnter
         {
-            get { return _controllerCommon.IsPressed(false,Keys.Enter, Keys.Space); }
+            get { return _controllerCommon.IsPressed(false,Keys.Enter); }
         }
 
         public bool IsBack

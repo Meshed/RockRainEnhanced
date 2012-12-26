@@ -100,10 +100,12 @@
     <Compile Include="MeteorsManager.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PowerSource.cs" />
+    <Compile Include="PowerUp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Score.cs" />
+    <Compile Include="Wrench.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

@@ -107,6 +107,10 @@ namespace RockRainEnhanced
             {
                 PutinStartPosition();
             }
+            if (position.Y < 0)
+            {
+                YSpeed = YSpeed*-1;
+            }
 
             // Move meteor
             Position = new Vector2(Position.X + xSpeed, Position.Y + ySpeed);
@@ -115,10 +119,33 @@ namespace RockRainEnhanced
             base.Update(gameTime);
         }
 
+        public bool CheckCollision(Meteor otherMeteor)
+        {
+            Rectangle spriteRect = new Rectangle((int)position.X, (int)position.Y, currentFrame.Width, currentFrame.Height);
+            return otherMeteor.CheckCollision(spriteRect);
+        }
+
         public bool CheckCollision(Rectangle rect)
         {
             var spriteRect = new Rectangle((int) Position.X, (int) Position.Y, CurrentFrame.Width, CurrentFrame.Height);
             return spriteRect.Intersects(rect);
+        }
+
+        public void Bounce(Meteor meteor)
+        {
+            XSpeed = XSpeed*-1;
+            YSpeed = YSpeed*-1;
+
+            if (position.X < meteor.position.X)
+            {
+                // Left
+                position.X = meteor.position.X - currentFrame.Width;
+            }
+            else
+            {
+                // Right
+                position.X = meteor.position.X + meteor.currentFrame.Width;
+            }
         }
     }
 }
