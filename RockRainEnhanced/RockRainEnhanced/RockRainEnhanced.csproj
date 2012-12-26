@@ -81,6 +81,7 @@
     <Compile Include="ControllerStrategy\IController.cs" />
     <Compile Include="ControllerStrategy\WasdController.cs" />
     <Compile Include="ControllerStrategy\XboxController.cs" />
+    <Compile Include="Core\DisplayAttribute.cs" />
     <Compile Include="Core\GameScene.cs" />
     <Compile Include="Core\ImageComponent.cs" />
     <Compile Include="Core\Sprite.cs" />

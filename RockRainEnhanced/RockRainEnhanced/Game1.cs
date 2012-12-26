@@ -224,23 +224,23 @@ namespace RockRainEnhanced
 
                 _audio.MenuSelect.Play();
 
-                switch (_startScene.SelectedMenuIndex)
+                switch ((StartScene.MenuItems)_startScene.SelectedMenuIndex)
                 {
-                    case 0:
+                    case StartScene.MenuItems.OnePlayer:
                         _actionScene = SetupActionScene1(this._menuControllers.ToArray());
                         this.Components.Add(_actionScene);
                         ShowScene(_actionScene); //skip join, use all controllers
                         break;
-                    case 1:
+                    case StartScene.MenuItems.TwoPlayers:
                         ShowScene(_joinScene);
                         break;
-                    case 2:
+                    case StartScene.MenuItems.Help:
                         ShowScene(_helpScene);
                         break;
-                    case 3: //scores
+                    case StartScene.MenuItems.Scores: //scores
                         this.ShowScene(_scoreScene);
                         break;
-                    case 4:
+                    case StartScene.MenuItems.Quit:
                         Exit();
                         break;
                 }

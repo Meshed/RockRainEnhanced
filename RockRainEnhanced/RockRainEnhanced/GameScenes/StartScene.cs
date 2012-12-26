@@ -18,6 +18,17 @@ namespace RockRainEnhanced.GameScenes
     /// </summary>
     public class StartScene : GameScene
     {
+        public enum MenuItems
+        {
+            [Display("One Player")]
+            OnePlayer,
+            [Display("Two Players")]
+            TwoPlayers,
+            Help,
+            Scores,
+            Quit
+
+        }
         TextMenuComponent menu;
         readonly Texture2D elements;
         AudioLibrary audio;
@@ -37,7 +48,7 @@ namespace RockRainEnhanced.GameScenes
             this.elements = elements;
             Components.Add(new ImageComponent(game, background, ImageComponent.DrawMode.Center));
 
-            string[] items = {"One Player", "Two Players", "Help", "Scores", "Quit"};
+            string[] items = Enum.GetNames(typeof(MenuItems)).Select(s => s.ToString()).ToArray();
             menu = new TextMenuComponent(game, smallFont, largeFont);
             menu.SetMenuItems(items);
             Components.Add(menu);
