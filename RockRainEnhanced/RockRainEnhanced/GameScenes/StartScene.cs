@@ -1,37 +1,23 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using RockRainEnhanced.Core;
 using RockRainEnhanced.Extensions;
 
 namespace RockRainEnhanced.GameScenes
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
     public class StartScene : GameScene
     {
-        public enum MenuItems
-        {
-            [Display("One Player")]
-            OnePlayer,
-            [Display("Two Players")]
-            TwoPlayers,
-            Help,
-            Scores,
-            Quit
-        }
-
         private readonly TextMenuComponent _menu;
 
-        private readonly Texture2D elements;
+        private readonly Texture2D _elements;
 
         readonly AudioLibrary _audio;
 
@@ -48,7 +34,7 @@ namespace RockRainEnhanced.GameScenes
         public StartScene(Game game, SpriteFont smallFont, SpriteFont largeFont, Texture2D background, Texture2D elements)
             : base(game)
         {
-            this.elements = elements;
+            this._elements = elements;
             Components.Add(new ImageComponent(game, background, ImageComponent.DrawMode.Center));
 
             string[] items = Enum.GetValues(typeof(MenuItems)).Cast<MenuItems>().Select(s => s.GetDisplayOrName()).ToArray();
@@ -60,21 +46,27 @@ namespace RockRainEnhanced.GameScenes
             this._audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
         }
 
-        /// <summary>
-        /// Allows the game component to perform any initialization it needs to before starting
-        /// to run.  This is where it can query for any required services and load content.
-        /// </summary>
-        public override void Initialize()
+        public enum MenuItems
         {
-            // TODO: Add your initialization code here
+            [Display("One Player")]
+            OnePlayer,
+            [Display("Two Players")]
+            TwoPlayers,
+            Help,
+            Scores,
+            Quit
+        }
 
-            base.Initialize();
+        public int SelectedMenuIndex
+        {
+            get { return this._menu.SelectedIndex; }
         }
 
         /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1407:ArithmeticExpressionsMustDeclarePrecedence", Justification = "Reviewed. Suppression is OK here.")]
         public override void Update(GameTime gameTime)
         {
             if (!this._menu.Visible)
@@ -83,6 +75,7 @@ namespace RockRainEnhanced.GameScenes
                 {
                     this._rainPosition.X -= 15;
                 }
+
                 if (this._rockPosition.X <= (Game.Window.ClientBounds.Width - 715) / 2)
                 {
                     this._rockPosition.X += 15;
@@ -119,12 +112,12 @@ namespace RockRainEnhanced.GameScenes
         {
             base.Draw(gameTime);
 
-            this._spriteBatch.Draw(elements, this._rockPosition, this._rockRect, Color.White);
-            this._spriteBatch.Draw(elements, this._rainPosition, this._rainRect, Color.White);
+            this._spriteBatch.Draw(this._elements, this._rockPosition, this._rockRect, Color.White);
+            this._spriteBatch.Draw(this._elements, this._rainPosition, this._rainRect, Color.White);
 
             if (this._showEnchanced)
             {
-                this._spriteBatch.Draw(elements, this._enhancedPosition, this._enhancedRect, Color.White);
+                this._spriteBatch.Draw(this._elements, this._enhancedPosition, this._enhancedRect, Color.White);
             }
         }
 
@@ -137,7 +130,7 @@ namespace RockRainEnhanced.GameScenes
             this._rainPosition.Y = 180;
 
             // Put the menu centered in screen
-            this._menu.Position = new Vector2((Game.Window.ClientBounds.Width - this._menu.Width)/2, 330);
+            this._menu.Position = new Vector2(x: (Game.Window.ClientBounds.Width - this._menu.Width) / 2, y: 330);
 
             this._menu.Visible = false;
             this._menu.Enabled = false;
@@ -150,11 +143,6 @@ namespace RockRainEnhanced.GameScenes
         {
             MediaPlayer.Stop();
             base.Hide();
-        }
-
-        public int SelectedMenuIndex
-        {
-            get { return this._menu.SelectedIndex; }
         }
     }
 }

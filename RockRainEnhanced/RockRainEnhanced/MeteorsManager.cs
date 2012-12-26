@@ -48,7 +48,6 @@ namespace RockRainEnhanced
 
             for (int i = 0; i < meteors.Count; i++)
             {
-                meteors[i].Initialize();
             }
 
             base.Initialize();
@@ -84,7 +83,6 @@ namespace RockRainEnhanced
         private void AddNewMeteor()
         {
             Meteor newMeteor = new Meteor(Game, ref meteorTexture);
-            newMeteor.Initialize();
             meteors.Add(newMeteor);
             newMeteor.Index = meteors.Count - 1;
         }

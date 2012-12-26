@@ -1,24 +1,21 @@
-#region Using Statements
-using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-#endregion
-
-namespace RockRain
+namespace RockRainEnhanced.Core
 {
+    using System;
+
+    using Microsoft.Xna.Framework;
+    using Microsoft.Xna.Framework.Input;
+
     /// <summary>
     /// This component helps shake your Joystick
     /// </summary>
-    public class SimpleRumblePad : Microsoft.Xna.Framework.GameComponent
+    public class SimpleRumblePad : GameComponent
     {
-        private int time;
-        private int lastTickCount;
+        int _time;
+        int _lastTickCount;
 
         public SimpleRumblePad(Game game)
             : base(game)
         {
-
         }
 
         /// <summary>
@@ -27,15 +24,30 @@ namespace RockRain
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            if (time > 0) {
-                int elapsed = System.Environment.TickCount - lastTickCount;
-                if (elapsed >= time)
+            if (this._time > 0)
+            {
+                int elapsed = Environment.TickCount - this._lastTickCount;
+                if (elapsed >= this._time)
                 {
-                    time = 0;
+                    this._time = 0;
                     GamePad.SetVibration(PlayerIndex.One, 0, 0);
                 }
             }
+
             base.Update(gameTime);
+        }
+        
+        /// <summary>
+        /// Set the vibration
+        /// </summary>
+        /// <param name="time">Vibration time</param>
+        /// <param name="leftMotor">Left Motor Intensity</param>
+        /// <param name="rightMotor">Right Motor Intensity</param>
+        public void RumblePad(int time, float leftMotor, float rightMotor)
+        {
+            this._lastTickCount = Environment.TickCount;
+            this._time = time;
+            GamePad.SetVibration(PlayerIndex.One, leftMotor, rightMotor);
         }
 
         /// <summary>
@@ -47,18 +59,5 @@ namespace RockRain
 
             base.Dispose(disposing);
         }
-
-        /// <summary>
-        /// Set the vibration
-        /// </summary>
-        /// <param name="Time">Vibration time</param>
-        /// <param name="LeftMotor">Left Motor Intensity</param>
-        /// <param name="RightMotor">Right Motor Intensity</param>
-        public void RumblePad(int Time, float LeftMotor, float RightMotor)
-        {
-            lastTickCount = System.Environment.TickCount;
-            time = Time;
-            GamePad.SetVibration(PlayerIndex.One, LeftMotor, RightMotor);
-        }  
     }
 }

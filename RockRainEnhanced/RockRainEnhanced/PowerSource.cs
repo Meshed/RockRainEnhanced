@@ -18,20 +18,13 @@ namespace RockRainEnhanced
     /// </summary>
     public class PowerSource : Sprite
     {
-        protected Texture2D texture;
-        protected Random random;
+        readonly Random random;
 
         public PowerSource(Game game, ref Texture2D theTexture)
             : base(game, ref theTexture)
         {
-            texture = theTexture;
-
             Frames = new List<Rectangle>();
-            Rectangle frame = new Rectangle();
-            frame.X = 291;
-            frame.Y = 17;
-            frame.Width = 14;
-            frame.Height = 12;
+            var frame = new Rectangle { X = 291, Y = 17, Width = 14, Height = 12 };
             Frames.Add(frame);
 
             frame.Y = 30;
@@ -49,27 +42,15 @@ namespace RockRainEnhanced
             frame.Y = 82;
             Frames.Add(frame);
 
-            frameDelay = 200;
+            FrameDelay = 200;
             random = new Random(GetHashCode());
             PutinStartPosition();
         }
 
         public void PutinStartPosition()
         {
-            position.X = random.Next(Game.Window.ClientBounds.Width - currentFrame.Width);
-            position.Y = -10;
+            Position = new Vector2(random.Next(Game.Window.ClientBounds.Width - CurrentFrame.Width), -10);
             Enabled = false;
-        }
-
-        /// <summary>
-        /// Allows the game component to perform any initialization it needs to before starting
-        /// to run.  This is where it can query for any required services and load content.
-        /// </summary>
-        public override void Initialize()
-        {
-            // TODO: Add your initialization code here
-
-            base.Initialize();
         }
 
         /// <summary>
@@ -79,20 +60,21 @@ namespace RockRainEnhanced
         public override void Update(GameTime gameTime)
         {
             // Check if power source is still visible
-            if (position.Y >= Game.Window.ClientBounds.Height)
+            if (Position.Y >= Game.Window.ClientBounds.Height)
             {
-                position.Y = 0;
+                Position = new Vector2(Position.X, 0);
                 Enabled = false;
             }
 
-            position.Y += 1;
+            Position = new Vector2(Position.X,Position.Y+1);
+            
 
             base.Update(gameTime);
         }
 
         public bool CheckCollision(Rectangle rect)
         {
-            Rectangle spriterect = new Rectangle((int) position.X, (int) position.Y, currentFrame.Width, currentFrame.Height);
+            var spriterect = new Rectangle((int) Position.X, (int) Position.Y, CurrentFrame.Width, CurrentFrame.Height);
             return spriterect.Intersects(rect);
         }
     }

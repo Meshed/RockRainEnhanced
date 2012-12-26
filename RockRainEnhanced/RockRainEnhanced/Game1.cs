@@ -1,25 +1,32 @@
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
-using RockRainEnhanced.ControllerStrategy;
-using RockRainEnhanced.Extensions;
-using RockRainEnhanced.GameScenes;
-using System.Diagnostics;
-
 namespace RockRainEnhanced
 {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using Microsoft.Xna.Framework;
+    using Microsoft.Xna.Framework.Graphics;
+    using RockRainEnhanced.ControllerStrategy;
+    using RockRainEnhanced.Core;
+    using RockRainEnhanced.Extensions;
+    using RockRainEnhanced.GameScenes;
+    
+    public class Game1 : Game
     {
         readonly GraphicsDeviceManager _graphics;
-        SpriteBatch _spriteBatch;
 
-        readonly  AudioLibrary _audio;
+        readonly Dictionary<int, string> _highScores = new Dictionary<int, string> { { 10, "Mas" }, { 11, "Bcn" } };
+
+        readonly AudioLibrary _audio;
+
+        readonly HashSet<IController> _menuControllers = new HashSet<IController>
+                                                             {
+                                                                 new WasdController(PlayerIndex.One),
+                                                                 new XboxController(PlayerIndex.One),
+                                                                 new ArrowController(PlayerIndex.One),
+                                                                 new XboxController(PlayerIndex.Two),
+                                                             };
+
+        SpriteBatch _spriteBatch;
 
         // Game scenes
         HelpScene _helpScene;
@@ -35,14 +42,7 @@ namespace RockRainEnhanced
         Texture2D _actionElementsTexture, _actionBackgroundTexture;
 
         // Fonts
-        SpriteFont _smallFont, _largeFont, _scoreFont;
-       
-        readonly HashSet<IController> _menuControllers = new HashSet<IController> {          
-            new WasdController(PlayerIndex.One),
-            new XboxController(PlayerIndex.One),
-            new ArrowController(PlayerIndex.One),
-            new XboxController(PlayerIndex.Two),
-        };
+        SpriteFont _smallFont, _largeFont, _scoreFont;      
 
         public Game1()
         {
@@ -55,21 +55,6 @@ namespace RockRainEnhanced
             // graphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
         }
-
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
-        {
-            // TODO: Add your initialization logic here
-
-            base.Initialize();
-        }
-
-        Dictionary<int,string > _highScores= new Dictionary<int, string>{{10,"Mas"},{11,"Bcn"}}; 
 
         protected override void LoadContent()
         {
@@ -103,54 +88,6 @@ namespace RockRainEnhanced
             _activeScene = _startScene;
             _scoreScene = new ScoreScene(this, this._largeFont, _highScores, _startBackgroundTexture);
             Components.Add(_scoreScene);
-        }
-
-        ActionScene SetUpActionScene2(IController controllerOne, IController controllerTwo)
-        {
-            Components.OfType<ActionScene>().ToList().ForEach(
-                a =>
-                    {
-                        Components.Remove(a);
-                        a.Dispose();
-                    });
-            _actionScene = new ActionScene(
-                controllerOne,
-                controllerTwo,
-                this,
-                this._actionElementsTexture,
-                this._actionBackgroundTexture,
-                this.GetScreenBounds(),
-                this._scoreFont,
-                new Vector2(100, 100));
-            Components.Add(_actionScene);
-            return _actionScene;
-        }
-
-        ActionScene SetupActionScene1(params IController[] controllers)
-        {
-            Components.OfType<ActionScene>().ToList().ForEach(a =>
-            {
-                Components.Remove(a);
-                a.Dispose();
-            });
-            _actionScene = new ActionScene(
-                this, 
-                this._actionElementsTexture, 
-                this._actionBackgroundTexture, 
-                this._scoreFont, 
-                this.GetScreenBounds(), 
-                new Vector2(100, 100), 
-                controllers);
-            return _actionScene;
-        }
-
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
         }
 
         /// <summary>
@@ -207,8 +144,49 @@ namespace RockRainEnhanced
 
         void HandleScoreSceneInput()
         {
-            if(this._menuControllers.Any(m=>m.IsBack))
+            if (this._menuControllers.Any(m => m.IsBack))
+            {
                 this.ShowScene(_startScene);
+            }
+        }
+
+        ActionScene SetUpActionScene2(IController controllerOne, IController controllerTwo)
+        {
+            Components.OfType<ActionScene>().ToList().ForEach(
+                a =>
+                {
+                    Components.Remove(a);
+                    a.Dispose();
+                });
+            _actionScene = new ActionScene(
+                controllerOne,
+                controllerTwo,
+                this,
+                this._actionElementsTexture,
+                this._actionBackgroundTexture,
+                this.GetScreenBounds(),
+                this._scoreFont,
+                new Vector2(100, 100));
+            Components.Add(_actionScene);
+            return _actionScene;
+        }
+
+        ActionScene SetupActionScene1(params IController[] controllers)
+        {
+            Components.OfType<ActionScene>().ToList().ForEach(a =>
+            {
+                Components.Remove(a);
+                a.Dispose();
+            });
+            _actionScene = new ActionScene(
+                this,
+                this._actionElementsTexture,
+                this._actionBackgroundTexture,
+                this._scoreFont,
+                this.GetScreenBounds(),
+                new Vector2(100, 100),
+                controllers);
+            return _actionScene;
         }
 
         void HandleHelpSceneInput()
@@ -221,7 +199,6 @@ namespace RockRainEnhanced
         {
             if (this._menuControllers.Any(m => m.IsEnter))
             {
-
                 _audio.MenuSelect.Play();
 
                 switch ((StartScene.MenuItems)_startScene.SelectedMenuIndex)
@@ -229,7 +206,7 @@ namespace RockRainEnhanced
                     case StartScene.MenuItems.OnePlayer:
                         _actionScene = SetupActionScene1(this._menuControllers.ToArray());
                         this.Components.Add(_actionScene);
-                        ShowScene(_actionScene); //skip join, use all controllers
+                        ShowScene(_actionScene); // skip join, use all controllers
                         break;
                     case StartScene.MenuItems.TwoPlayers:
                         ShowScene(_joinScene);
@@ -237,7 +214,7 @@ namespace RockRainEnhanced
                     case StartScene.MenuItems.Help:
                         ShowScene(_helpScene);
                         break;
-                    case StartScene.MenuItems.Scores: //scores
+                    case StartScene.MenuItems.Scores: // scores
                         this.ShowScene(_scoreScene);
                         break;
                     case StartScene.MenuItems.Quit:
