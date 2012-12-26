@@ -24,6 +24,11 @@ namespace RockRainEnhanced.Extensions
                 throw new NullReferenceException(name);
         }
 
+        /// <summary>
+        /// http://stackoverflow.com/a/4368126/57883
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string GetDisplayOrName(this Enum value)
         {
             var display=
