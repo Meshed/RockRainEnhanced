@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using RockRainEnhanced.Core;
-
+using RockRainEnhanced.Extensions;
 
 namespace RockRainEnhanced.GameScenes
 {
@@ -48,7 +48,7 @@ namespace RockRainEnhanced.GameScenes
             this.elements = elements;
             Components.Add(new ImageComponent(game, background, ImageComponent.DrawMode.Center));
 
-            string[] items = Enum.GetNames(typeof(MenuItems)).Select(s => s.ToString()).ToArray();
+            string[] items = Enum.GetValues(typeof(MenuItems)).Cast<MenuItems>().Select(s => s.GetDisplayOrName()).ToArray();
             menu = new TextMenuComponent(game, smallFont, largeFont);
             menu.SetMenuItems(items);
             Components.Add(menu);
