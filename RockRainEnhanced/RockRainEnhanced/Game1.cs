@@ -111,9 +111,21 @@ namespace RockRainEnhanced
         }
         ActionScene SetUpActionScene2(IController controllerOne, IController controllerTwo)
         {
-            Components.OfType<ActionScene>().ToList().ForEach(a => { Components.Remove(a); a.Dispose(); });
-            _actionScene = new ActionScene(controllerOne, controllerTwo,this, actionElementsTexture,
-                actionBackgroundTexture, this.GetScreenBounds(),scoreFont);
+            Components.OfType<ActionScene>().ToList().ForEach(
+                a =>
+                    {
+                        Components.Remove(a);
+                        a.Dispose();
+                    });
+            _actionScene = new ActionScene(
+                controllerOne,
+                controllerTwo,
+                this,
+                actionElementsTexture,
+                actionBackgroundTexture,
+                this.GetScreenBounds(),
+                scoreFont,
+                new Vector2(100, 100));
             Components.Add(_actionScene);
             return _actionScene;
         }
@@ -126,7 +138,7 @@ namespace RockRainEnhanced
                 Components.Remove(a);
                 a.Dispose();
             });
-            _actionScene = new ActionScene(this, actionElementsTexture, actionBackgroundTexture, scoreFont, this.GetScreenBounds(), controllers);
+            _actionScene = new ActionScene(this, actionElementsTexture, actionBackgroundTexture, scoreFont, this.GetScreenBounds(),new Vector2(100,100),  controllers);
             return _actionScene;
         }
 
@@ -238,13 +250,15 @@ namespace RockRainEnhanced
                 }
             }
 
-            if ((!_actionScene.TwoPlayers && menuControllers.Any(m=>m.IsBack)) || (_joinScene.PlayerOne!= null && _joinScene.PlayerOne.IsBack ) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsBack))
+            if ((!_actionScene.TwoPlayers && menuControllers.Any(m => m.IsBack))
+                || (_joinScene.PlayerOne != null && _joinScene.PlayerOne.IsBack)
+                || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsBack))
             {
                 ShowScene(_startScene);
             }
         }
 
-        protected void ShowScene(GameScene scene)
+        void ShowScene(GameScene scene)
         {
             _activeScene.Hide();
             _activeScene = scene;
