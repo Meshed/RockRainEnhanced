@@ -1,83 +1,70 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-
 
 namespace RockRainEnhanced.Core
 {
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class TextMenuComponent : Microsoft.Xna.Framework.DrawableGameComponent
+    public class TextMenuComponent : DrawableGameComponent
     {
-        protected SpriteBatch spriteBatch = null;
-        protected readonly SpriteFont regularFont, selectedFont;
-        protected Color regularColor = Color.White, selectedColor = Color.Red;
-        protected Vector2 position = new Vector2();
-        protected int selectedIndex = 0;
-        private readonly List<String> menuItems;
-        protected int width, height;
-        protected KeyboardState oldKeyboardState;
-        protected GamePadState oldGamePadState;
-        protected AudioLibrary audio;
-
-        public int Width
-        {
-            get { return width; }
-        }
-        public int Height
-        {
-            get { return height; }
-        }
-        public int SelectedIndex
-        {
-            get { return selectedIndex; }
-            set { selectedIndex = value; }
-        }
-        public Color RegularColor
-        {
-            get { return regularColor; }
-            set { regularColor = value; }
-        }
-        public Color SelectedColor
-        {
-            get { return selectedColor; }
-            set { selectedColor = value; }
-        }
-        public Vector2 Position
-        {
-            get { return position; }
-            set { position = value; }
-        }
+        readonly SpriteBatch _spriteBatch;
+        readonly SpriteFont _regularFont, _selectedFont;
+        readonly List<string> _menuItems;
+        readonly AudioLibrary _audio;
+        Color _regularColor = Color.White, _selectedColor = Color.Red;
+        Vector2 _position;
+        int _selectedIndex;
+        int _width, _height;
+        KeyboardState _oldKeyboardState;
+        GamePadState _oldGamePadState;        
 
         public TextMenuComponent(Game game, SpriteFont normalFont, SpriteFont selectedFont)
             : base(game)
         {
-            regularFont = normalFont;
-            this.selectedFont = selectedFont;
-            menuItems = new List<string>();
-            spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
-            audio = (AudioLibrary) Game.Services.GetService(typeof (AudioLibrary));
-            oldKeyboardState = Keyboard.GetState();
-            oldGamePadState = GamePad.GetState(PlayerIndex.One);
+            this._regularFont = normalFont;
+            this._selectedFont = selectedFont;
+            this._menuItems = new List<string>();
+            this._spriteBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
+            this._audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
+            this._oldKeyboardState = Keyboard.GetState();
+            this._oldGamePadState = GamePad.GetState(PlayerIndex.One);
         }
 
-        /// <summary>
-        /// Allows the game component to perform any initialization it needs to before starting
-        /// to run.  This is where it can query for any required services and load content.
-        /// </summary>
-        public override void Initialize()
+        public int Width
         {
-            // TODO: Add your initialization code here
+            get { return this._width; }
+        }
 
-            base.Initialize();
+        public int Height
+        {
+            get { return this._height; }
+        }
+
+        public int SelectedIndex
+        {
+            get { return this._selectedIndex; }
+            set { this._selectedIndex = value; }
+        }
+
+        public Color RegularColor
+        {
+            get { return this._regularColor; }
+            set { this._regularColor = value; }
+        }
+
+        public Color SelectedColor
+        {
+            get { return this._selectedColor; }
+            set { this._selectedColor = value; }
+        }
+
+        public Vector2 Position
+        {
+            get { return this._position; }
+            set { this._position = value; }
         }
 
         /// <summary>
@@ -89,71 +76,72 @@ namespace RockRainEnhanced.Core
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
             KeyboardState keyboardState = Keyboard.GetState();
 
-            bool down, up;
-
             // Handle the keyboard
-            down = (oldKeyboardState.IsKeyDown(Keys.Down) &&
-                    (keyboardState.IsKeyUp(Keys.Down)));
-            up = (oldKeyboardState.IsKeyDown(Keys.Up) &&
-                  (keyboardState.IsKeyUp(Keys.Up)));
+            bool down = this._oldKeyboardState.IsKeyDown(Keys.Down) &&
+                         keyboardState.IsKeyUp(Keys.Down);
+            bool up = this._oldKeyboardState.IsKeyDown(Keys.Up) &&
+                      keyboardState.IsKeyUp(Keys.Up);
 
             // Handle the gamepad
-            down |= (oldGamePadState.DPad.Down == ButtonState.Pressed) &&
+            down |= (this._oldGamePadState.DPad.Down == ButtonState.Pressed) &&
                     (gamePadState.DPad.Down == ButtonState.Released);
-            up |= (oldGamePadState.DPad.Up == ButtonState.Pressed) &&
+            up |= (this._oldGamePadState.DPad.Up == ButtonState.Pressed) &&
                   (gamePadState.DPad.Up == ButtonState.Released);
 
             if (down || up)
             {
-                audio.MenuScroll.Play();
+                this._audio.MenuScroll.Play();
             }
 
             if (down)
             {
-                selectedIndex++;
-                if (selectedIndex == menuItems.Count)
+                this._selectedIndex++;
+                if (this._selectedIndex == this._menuItems.Count)
                 {
-                    selectedIndex = 0;
-                }
-            }
-            if (up)
-            {
-                selectedIndex--;
-                if (selectedIndex == -1)
-                {
-                    selectedIndex = menuItems.Count - 1;
+                    this._selectedIndex = 0;
                 }
             }
 
-            oldKeyboardState = keyboardState;
-            oldGamePadState = gamePadState;
+            if (up)
+            {
+                this._selectedIndex--;
+                if (this._selectedIndex == -1)
+                {
+                    this._selectedIndex = this._menuItems.Count - 1;
+                }
+            }
+
+            this._oldKeyboardState = keyboardState;
+            this._oldGamePadState = gamePadState;
 
             base.Update(gameTime);
         }
+
         public override void Draw(GameTime gameTime)
         {
-            float y = position.Y;
+            float y = this._position.Y;
 
-            for (int i = 0; i < menuItems.Count; i++)
+            for (int i = 0; i < this._menuItems.Count; i++)
             {
                 SpriteFont font;
                 Color theColor;
 
-                if (i == selectedIndex)
+                if (i == this._selectedIndex)
                 {
-                    font = selectedFont;
-                    theColor = selectedColor;
+                    font = this._selectedFont;
+                    theColor = this._selectedColor;
                 }
                 else
                 {
-                    font = regularFont;
-                    theColor = regularColor;
+                    font = this._regularFont;
+                    theColor = this._regularColor;
                 }
 
                 // Draw the text shadow
-                spriteBatch.DrawString(font, menuItems[i], new Vector2(position.X + 1, y + 1), Color.Black);
+                this._spriteBatch.DrawString(font, this._menuItems[i], new Vector2(this._position.X + 1, y + 1), Color.Black);
+
                 // Draw the text item
-                spriteBatch.DrawString(font, menuItems[i], new Vector2(position.X, y), theColor);
+                this._spriteBatch.DrawString(font, this._menuItems[i], new Vector2(this._position.X, y), theColor);
                 y += font.LineSpacing;
             }
 
@@ -162,25 +150,26 @@ namespace RockRainEnhanced.Core
 
         public void SetMenuItems(params string[] items)
         {
-            menuItems.Clear();
-            menuItems.AddRange(items);
+            this._menuItems.Clear();
+            this._menuItems.AddRange(items);
             CalculateBounds();
         }
+
         public void CalculateBounds()
         {
-            width = 0;
-            height = 0;
+            this._width = 0;
+            this._height = 0;
 
-            foreach (string menuItem in menuItems)
+            foreach (string menuItem in this._menuItems)
             {
-                Vector2 size = selectedFont.MeasureString(menuItem);
+                Vector2 size = this._selectedFont.MeasureString(menuItem);
 
-                if (size.X > width)
+                if (size.X > this._width)
                 {
-                    width = (int) size.X;
+                    this._width = (int)size.X;
                 }
 
-                height += selectedFont.LineSpacing;
+                this._height += this._selectedFont.LineSpacing;
             }
         }
     }

@@ -22,20 +22,8 @@ namespace RockRainEnhanced
 
         public void PutinStartPosition()
         {
-            position.X = Random.Next(Game.Window.ClientBounds.Width - currentFrame.Width);
-            position.Y = -texture.Height;
+            Position = new Vector2(Random.Next(Game.Window.ClientBounds.Width - CurrentFrame.Width), -Texture.Height);
             Enabled = false;
-        }
-
-        /// <summary>
-        /// Allows the game component to perform any initialization it needs to before starting
-        /// to run.  This is where it can query for any required services and load content.
-        /// </summary>
-        public override void Initialize()
-        {
-            // TODO: Add your initialization code here
-
-            base.Initialize();
         }
 
         /// <summary>
@@ -45,20 +33,20 @@ namespace RockRainEnhanced
         public override void Update(GameTime gameTime)
         {
             // Check if power up is still visible
-            if (position.Y >= Game.Window.ClientBounds.Height)
+            if (Position.Y >= Game.Window.ClientBounds.Height)
             {
-                position.Y = 0;
+                Position = new Vector2(Position.X, 0);
                 Enabled = false;
             }
 
-            position.Y += 1;
+            Position = new Vector2(Position.X, Position.Y + 1);
 
             base.Update(gameTime);
         }
 
         public bool CheckCollision(Rectangle rect)
         {
-            Rectangle spriterect = new Rectangle((int)position.X, (int)position.Y, currentFrame.Width, currentFrame.Height);
+            Rectangle spriterect = new Rectangle((int)Position.X, (int)Position.Y, CurrentFrame.Width, CurrentFrame.Height);
             return spriterect.Intersects(rect);
         }
     }
