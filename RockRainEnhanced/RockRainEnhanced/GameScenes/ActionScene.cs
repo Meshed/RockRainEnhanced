@@ -176,8 +176,8 @@ namespace RockRainEnhanced.GameScenes
             }
 
             this._paused = false;
-            this._pausePosition.X = Game.Window.ClientBounds.Width - this._pauseRect.Width / 2;
-            this._pausePosition.Y = Game.Window.ClientBounds.Height - this._pauseRect.Height / 2;
+            this._pausePosition.X = (Game.Window.ClientBounds.Width - this._pauseRect.Width) / 2;
+            this._pausePosition.Y = (Game.Window.ClientBounds.Height - this._pauseRect.Height) / 2;
 
             base.Show();
         }

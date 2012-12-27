@@ -66,8 +66,7 @@ namespace RockRainEnhanced
                 Enabled = false;
             }
 
-            Position = new Vector2(Position.X,Position.Y+1);
-            
+            Position = new Vector2(Position.X, Position.Y + 1);
 
             base.Update(gameTime);
         }

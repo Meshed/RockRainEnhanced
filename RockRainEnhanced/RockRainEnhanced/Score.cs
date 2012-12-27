@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using RockRainEnhanced.Extensions;
 
 namespace RockRainEnhanced
 {
@@ -10,7 +11,6 @@ namespace RockRainEnhanced
         int _value;
         int _power;
         readonly SpriteFont _font;
-        private Color _fontColor;
 
         public int Value
         {
@@ -28,21 +28,17 @@ namespace RockRainEnhanced
             set { _position = value; }
         }
 
-        public Color FontColor
-        {
-            get { return _fontColor; }
-            set { _fontColor = value; }
-        }
-
+        
         public Color ValueFontColor { get; set; }
         public Color PowerFontColor { get; set; }
 
         public Score(Game game, SpriteFont font, Color fontColor) : base(game)
         {
             _font = font;
-            _fontColor = fontColor;
             ValueFontColor = fontColor;
-            _spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
+            PowerFontColor = fontColor;
+
+            _spriteBatch = Game.GetGameService<SpriteBatch>();
         }
 
         public override void Draw(GameTime gameTime)

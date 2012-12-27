@@ -69,6 +69,14 @@ namespace RockRainEnhanced.Core
             }
         }
 
+        protected Texture2D Texture
+        {
+            get
+            {
+                return this._texture;
+            }
+        }
+
         /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
@@ -98,7 +106,7 @@ namespace RockRainEnhanced.Core
         public override void Draw(GameTime gameTime)
         {
             if(_spriteBatch != null)
-            this._spriteBatch.Draw(this._texture, this.Position, this.CurrentFrame, Color.White);
+            this._spriteBatch.Draw(this.Texture, this.Position, this.CurrentFrame, Color.White);
 
             base.Draw(gameTime);
         }

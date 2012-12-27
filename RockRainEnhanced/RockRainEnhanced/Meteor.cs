@@ -22,7 +22,7 @@ namespace RockRainEnhanced
         protected int xSpeed;
         protected Random random;
 
-        private int index;
+        private int _index;
 
         public int YSpeed
         {
@@ -30,7 +30,7 @@ namespace RockRainEnhanced
             set
             {
                 ySpeed = value;
-                FrameDelay = 200 - (ySpeed*5);
+                FrameDelay = 200 - (ySpeed * 5);
             }
         }
 
@@ -42,20 +42,16 @@ namespace RockRainEnhanced
 
         public int Index
         {
-            get { return index; }
-            set { index = value; }
+            get { return this._index; }
+            set { this._index = value; }
         }
 
         public Meteor(Game game, ref Texture2D theTexture)
             : base(game, ref theTexture)
         {
             Frames = new List<Rectangle>();
-            Rectangle frame = new Rectangle();
+            var frame = new Rectangle { X = 468, Y = 0, Width = 49, Height = 44 };
 
-            frame.X = 468;
-            frame.Y = 0;
-            frame.Width = 49;
-            frame.Height = 44;
             Frames.Add(frame);
 
             frame.Y = 50;
@@ -107,9 +103,10 @@ namespace RockRainEnhanced
             {
                 PutinStartPosition();
             }
-            if (position.Y < 0)
+
+            if (Position.Y < 0)
             {
-                YSpeed = YSpeed*-1;
+                YSpeed = YSpeed * -1;
             }
 
             // Move meteor
@@ -121,30 +118,30 @@ namespace RockRainEnhanced
 
         public bool CheckCollision(Meteor otherMeteor)
         {
-            Rectangle spriteRect = new Rectangle((int)position.X, (int)position.Y, currentFrame.Width, currentFrame.Height);
+            var spriteRect = new Rectangle((int)Position.X, (int)Position.Y, CurrentFrame.Width, CurrentFrame.Height);
             return otherMeteor.CheckCollision(spriteRect);
         }
 
         public bool CheckCollision(Rectangle rect)
         {
-            var spriteRect = new Rectangle((int) Position.X, (int) Position.Y, CurrentFrame.Width, CurrentFrame.Height);
+            var spriteRect = new Rectangle((int)Position.X, (int)Position.Y, CurrentFrame.Width, CurrentFrame.Height);
             return spriteRect.Intersects(rect);
         }
 
         public void Bounce(Meteor meteor)
         {
-            XSpeed = XSpeed*-1;
-            YSpeed = YSpeed*-1;
+            XSpeed = XSpeed * -1;
+            YSpeed = YSpeed * -1;
 
-            if (position.X < meteor.position.X)
+            if (Position.X < meteor.Position.X)
             {
                 // Left
-                position.X = meteor.position.X - currentFrame.Width;
+                Position = new Vector2(meteor.Position.X - CurrentFrame.Width, Position.Y);
             }
             else
             {
                 // Right
-                position.X = meteor.position.X + meteor.currentFrame.Width;
+                Position = new Vector2(meteor.Position.X + meteor.CurrentFrame.Width, Position.Y);
             }
         }
     }
