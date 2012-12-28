@@ -30,7 +30,7 @@ namespace RockRainEnhanced
             set
             {
                 ySpeed = value;
-                frameDelay = 200 - (ySpeed*5);
+                FrameDelay = 200 - (ySpeed*5);
             }
         }
 
@@ -89,21 +89,9 @@ namespace RockRainEnhanced
 
         public void PutinStartPosition()
         {
-            position.X = random.Next(Game.Window.ClientBounds.Width - currentFrame.Width);
-            position.Y = 0;
+            Position = new Vector2(random.Next(Game.Window.ClientBounds.Width - CurrentFrame.Width), 0);
             YSpeed = 1 + random.Next(9);
             XSpeed = random.Next(3) - 1;
-        }
-
-        /// <summary>
-        /// Allows the game component to perform any initialization it needs to before starting
-        /// to run.  This is where it can query for any required services and load content.
-        /// </summary>
-        public override void Initialize()
-        {
-            // TODO: Add your initialization code here
-
-            base.Initialize();
         }
 
         /// <summary>
@@ -113,9 +101,9 @@ namespace RockRainEnhanced
         public override void Update(GameTime gameTime)
         {
             // Check if the meteor is still visible
-            if ((position.Y >= Game.Window.ClientBounds.Height) ||
-                (position.X >= Game.Window.ClientBounds.Width) ||
-                (position.X <= 0))
+            if ((Position.Y >= Game.Window.ClientBounds.Height) ||
+                (Position.X >= Game.Window.ClientBounds.Width) ||
+                (Position.X <= 0))
             {
                 PutinStartPosition();
             }
@@ -125,8 +113,8 @@ namespace RockRainEnhanced
             }
 
             // Move meteor
-            position.Y += ySpeed;
-            position.X += xSpeed;
+            Position = new Vector2(Position.X + xSpeed, Position.Y + ySpeed);
+            
 
             base.Update(gameTime);
         }
@@ -139,7 +127,7 @@ namespace RockRainEnhanced
 
         public bool CheckCollision(Rectangle rect)
         {
-            Rectangle spriteRect = new Rectangle((int) position.X, (int) position.Y, currentFrame.Width, currentFrame.Height);
+            var spriteRect = new Rectangle((int) Position.X, (int) Position.Y, CurrentFrame.Width, CurrentFrame.Height);
             return spriteRect.Intersects(rect);
         }
 

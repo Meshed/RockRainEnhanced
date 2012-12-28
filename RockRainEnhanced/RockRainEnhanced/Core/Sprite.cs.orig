@@ -13,9 +13,15 @@ namespace RockRainEnhanced.Core
     /// </summary>
     public class Sprite : DrawableGameComponent
     {
+<<<<<<< HEAD
+        private int activeFrame;
+        protected readonly Texture2D texture;
+        private List<Rectangle> frames;
+=======
         readonly Texture2D _texture;
 
         long _frameDelay;
+>>>>>>> 7862810a58b3b6205b3393ac4fff4f494b2e7287
 
         int _activeFrame;
         

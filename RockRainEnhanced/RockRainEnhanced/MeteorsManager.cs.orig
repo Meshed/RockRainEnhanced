@@ -39,6 +39,15 @@ namespace RockRainEnhanced
         {
             meteors.Clear();
 
+<<<<<<< HEAD
+=======
+            Start();
+
+            for (int i = 0; i < meteors.Count; i++)
+            {
+            }
+
+>>>>>>> 7862810a58b3b6205b3393ac4fff4f494b2e7287
             base.Initialize();
         }
 
@@ -73,7 +82,12 @@ namespace RockRainEnhanced
 
         private void AddNewMeteor()
         {
+<<<<<<< HEAD
             var newMeteor = new Meteor(Game, ref meteorTexture);
+            newMeteor.Initialize();
+=======
+            Meteor newMeteor = new Meteor(Game, ref meteorTexture);
+>>>>>>> 7862810a58b3b6205b3393ac4fff4f494b2e7287
             meteors.Add(newMeteor);
             newMeteor.Index = meteors.Count - 1;
         }

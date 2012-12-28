@@ -16,10 +16,13 @@ namespace RockRainEnhanced
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class PowerSource : Sprite
+    public class PowerSource : PowerUp
     {
+<<<<<<< HEAD
+=======
         readonly Random random;
 
+>>>>>>> 7862810a58b3b6205b3393ac4fff4f494b2e7287
         public PowerSource(Game game, ref Texture2D theTexture)
             : base(game, ref theTexture)
         {
@@ -42,6 +45,12 @@ namespace RockRainEnhanced
             frame.Y = 82;
             Frames.Add(frame);
 
+<<<<<<< HEAD
+            frameDelay = 200;
+            Random = new Random(GetHashCode());
+            PutinStartPosition();
+            EffectValue = 25;
+=======
             FrameDelay = 200;
             random = new Random(GetHashCode());
             PutinStartPosition();
@@ -51,6 +60,7 @@ namespace RockRainEnhanced
         {
             Position = new Vector2(random.Next(Game.Window.ClientBounds.Width - CurrentFrame.Width), -10);
             Enabled = false;
+>>>>>>> 7862810a58b3b6205b3393ac4fff4f494b2e7287
         }
 
         /// <summary>
@@ -59,6 +69,10 @@ namespace RockRainEnhanced
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
+<<<<<<< HEAD
+            base.Update(gameTime);
+        }
+=======
             // Check if power source is still visible
             if (Position.Y >= Game.Window.ClientBounds.Height)
             {
@@ -77,5 +91,6 @@ namespace RockRainEnhanced
             var spriterect = new Rectangle((int) Position.X, (int) Position.Y, CurrentFrame.Width, CurrentFrame.Height);
             return spriterect.Intersects(rect);
         }
+>>>>>>> 7862810a58b3b6205b3393ac4fff4f494b2e7287
     }
 }
