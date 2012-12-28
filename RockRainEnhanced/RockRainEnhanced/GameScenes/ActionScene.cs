@@ -145,7 +145,7 @@ namespace RockRainEnhanced.GameScenes
 
         public override void Show()
         {
-            
+            MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(_audio.BackMusic);
             _meteors.Initialize();
             _powerSource.PutinStartPosition();
