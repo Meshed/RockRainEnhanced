@@ -74,6 +74,7 @@ namespace RockRainEnhanced
         private void AddNewMeteor()
         {
             var newMeteor = new Meteor(Game, ref meteorTexture);
+            newMeteor.Initialize();
             meteors.Add(newMeteor);
             newMeteor.Index = meteors.Count - 1;
         }

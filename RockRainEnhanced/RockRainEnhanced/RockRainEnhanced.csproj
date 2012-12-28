@@ -65,9 +65,6 @@
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.GamerServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="mscorlib" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -81,7 +78,6 @@
     <Compile Include="ControllerStrategy\IController.cs" />
     <Compile Include="ControllerStrategy\WasdController.cs" />
     <Compile Include="ControllerStrategy\XboxController.cs" />
-    <Compile Include="Core\DisplayAttribute.cs" />
     <Compile Include="Core\GameScene.cs" />
     <Compile Include="Core\ImageComponent.cs" />
     <Compile Include="Core\Sprite.cs" />
@@ -94,7 +90,6 @@
     <Compile Include="GameScenes\ActionScene.cs" />
     <Compile Include="GameScenes\HelpScene.cs" />
     <Compile Include="GameScenes\JoinScene.cs" />
-    <Compile Include="GameScenes\ScoreScene.cs" />
     <Compile Include="GameScenes\StartScene.cs" />
     <Compile Include="Meteor.cs" />
     <Compile Include="MeteorsManager.cs" />
@@ -146,11 +141,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

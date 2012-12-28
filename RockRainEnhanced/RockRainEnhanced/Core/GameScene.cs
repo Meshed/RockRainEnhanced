@@ -1,27 +1,35 @@
-namespace RockRainEnhanced.Core
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
+
+namespace RockRainEnhanced
+{
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class GameScene : DrawableGameComponent
+    public class GameScene : Microsoft.Xna.Framework.DrawableGameComponent
     {
-        private readonly List<GameComponent> _components;
+        private readonly List<GameComponent> components;
+
+        public List<GameComponent> Components
+        {
+            get { return components; }
+        }
 
         public GameScene(Game game)
             : base(game)
         {
-            this._components = new List<GameComponent>();
-            this.Visible = false;
-            this.Enabled = false;
-        }
-
-        public IList<GameComponent> Components
-        {
-            get { return this._components; }
+            components = new List<GameComponent>();
+            Visible = false;
+            Enabled = false;
         }
 
         /// <summary>
@@ -29,8 +37,8 @@ namespace RockRainEnhanced.Core
         /// </summary>
         public virtual void Show()
         {
-            this.Visible = true;
-            this.Enabled = true;
+            Visible = true;
+            Enabled = true;
         }
 
         /// <summary>
@@ -38,8 +46,19 @@ namespace RockRainEnhanced.Core
         /// </summary>
         public virtual void Hide()
         {
-            this.Visible = false;
-            this.Enabled = false;
+            Visible = false;
+            Enabled = false;
+        }
+
+        /// <summary>
+        /// Allows the game component to perform any initialization it needs to before starting
+        /// to run.  This is where it can query for any required services and load content.
+        /// </summary>
+        public override void Initialize()
+        {
+            // TODO: Add your initialization code here
+
+            base.Initialize();
         }
 
         /// <summary>
@@ -49,9 +68,12 @@ namespace RockRainEnhanced.Core
         public override void Update(GameTime gameTime)
         {
             // Update the child GameComponents (if Enabled)
-            foreach (GameComponent gc in this._components.Where(c => c.Enabled))
+            for (int i = 0; i < components.Count; i++)
             {
-                gc.Update(gameTime);
+                if (components[i].Enabled)
+                {
+                    components[i].Update(gameTime);
+                }
             }
 
             base.Update(gameTime);
@@ -60,9 +82,14 @@ namespace RockRainEnhanced.Core
         public override void Draw(GameTime gameTime)
         {
             // Draw the child GameComponents (if drawable)
-            foreach (var dgc in this._components.OfType<DrawableGameComponent>().Where(c => c.Visible))
+            for (int i = 0; i < components.Count; i++)
             {
-                dgc.Draw(gameTime);
+                GameComponent gc = components[i];
+                if ((gc is DrawableGameComponent) &&
+                    ((DrawableGameComponent) gc).Visible)
+                {
+                    ((DrawableGameComponent) gc).Draw(gameTime);
+                }
             }
 
             base.Draw(gameTime);

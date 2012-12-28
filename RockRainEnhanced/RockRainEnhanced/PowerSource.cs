@@ -16,15 +16,17 @@ namespace RockRainEnhanced
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class PowerSource : Sprite
+    public class PowerSource : PowerUp
     {
-        readonly Random random;
-
         public PowerSource(Game game, ref Texture2D theTexture)
             : base(game, ref theTexture)
         {
             Frames = new List<Rectangle>();
-            var frame = new Rectangle { X = 291, Y = 17, Width = 14, Height = 12 };
+            Rectangle frame = new Rectangle();
+            frame.X = 291;
+            frame.Y = 17;
+            frame.Width = 14;
+            frame.Height = 12;
             Frames.Add(frame);
 
             frame.Y = 30;
@@ -42,15 +44,21 @@ namespace RockRainEnhanced
             frame.Y = 82;
             Frames.Add(frame);
 
-            FrameDelay = 200;
-            random = new Random(GetHashCode());
+            frameDelay = 200;
+            Random = new Random(GetHashCode());
             PutinStartPosition();
+            EffectValue = 25;
         }
 
-        public void PutinStartPosition()
+        /// <summary>
+        /// Allows the game component to perform any initialization it needs to before starting
+        /// to run.  This is where it can query for any required services and load content.
+        /// </summary>
+        public override void Initialize()
         {
-            Position = new Vector2(random.Next(Game.Window.ClientBounds.Width - CurrentFrame.Width), -10);
-            Enabled = false;
+            // TODO: Add your initialization code here
+
+            base.Initialize();
         }
 
         /// <summary>
@@ -59,23 +67,7 @@ namespace RockRainEnhanced
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            // Check if power source is still visible
-            if (Position.Y >= Game.Window.ClientBounds.Height)
-            {
-                Position = new Vector2(Position.X, 0);
-                Enabled = false;
-            }
-
-            Position = new Vector2(Position.X,Position.Y+1);
-            
-
             base.Update(gameTime);
-        }
-
-        public bool CheckCollision(Rectangle rect)
-        {
-            var spriterect = new Rectangle((int) Position.X, (int) Position.Y, CurrentFrame.Width, CurrentFrame.Height);
-            return spriterect.Intersects(rect);
         }
     }
 }

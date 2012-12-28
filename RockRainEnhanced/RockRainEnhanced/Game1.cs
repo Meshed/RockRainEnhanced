@@ -1,32 +1,27 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using RockRainEnhanced.GameScenes;
+using RockRainEnhanced.ControllerStrategy;
+using RockRainEnhanced.Extensions;
+
 namespace RockRainEnhanced
 {
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using Microsoft.Xna.Framework;
-    using Microsoft.Xna.Framework.Graphics;
-    using RockRainEnhanced.ControllerStrategy;
-    using RockRainEnhanced.Core;
-    using RockRainEnhanced.Extensions;
-    using RockRainEnhanced.GameScenes;
-    
+    /// <summary>
+    /// This is the main type for your game
+    /// </summary>
     public class Game1 : Game
     {
         readonly GraphicsDeviceManager _graphics;
-
-        readonly Dictionary<int, string> _highScores = new Dictionary<int, string> { { 10, "Mas" }, { 11, "Bcn" } };
-
-        readonly AudioLibrary _audio;
-
-        readonly HashSet<IController> _menuControllers = new HashSet<IController>
-                                                             {
-                                                                 new WasdController(PlayerIndex.One),
-                                                                 new XboxController(PlayerIndex.One),
-                                                                 new ArrowController(PlayerIndex.One),
-                                                                 new XboxController(PlayerIndex.Two),
-                                                             };
-
         SpriteBatch _spriteBatch;
+        private AudioLibrary _audio;
 
         // Game scenes
         HelpScene _helpScene;
@@ -34,26 +29,56 @@ namespace RockRainEnhanced
         ActionScene _actionScene;
         JoinScene _joinScene;
         GameScene _activeScene;
-        ScoreScene _scoreScene;
 
         // Textures
-        Texture2D _helpBackgroundTexture, _helpForegroundTexture;
-        Texture2D _startBackgroundTexture, _startElementsTexture;
-        Texture2D _actionElementsTexture, _actionBackgroundTexture;
+        protected Texture2D helpBackgroundTexture, helpForegroundTexture;
+        protected Texture2D startBackgroundTexture, startElementsTexture;
+        protected Texture2D actionElementsTexture, actionBackgroundTexture;
 
         // Fonts
-        SpriteFont _smallFont, _largeFont, _scoreFont;      
+        SpriteFont smallFont, largeFont, scoreFont;
+
+        protected KeyboardState oldKeyboardState;
+        //protected GamePadState oldGamePadState;
+
+        HashSet<IController> menuControllers = new HashSet<IController>()
+        {          
+            new ControllerStrategy.WasdController(PlayerIndex.One),
+            new ControllerStrategy.XboxController(PlayerIndex.One),
+            new ControllerStrategy.ArrowController(PlayerIndex.One),
+            new ControllerStrategy.XboxController(PlayerIndex.Two),
+        };
+
+        IDictionary<PlayerIndex, IController> _playerController = new Dictionary<PlayerIndex, IController>();
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             _audio = new AudioLibrary();
+#if DEBUG
+            _graphics.PreferredBackBufferWidth = 800;
+            _graphics.PreferredBackBufferHeight = 600;
+            _graphics.IsFullScreen = false;
+#else
             _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-
-            // graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = true;
+#endif
             Content.RootDirectory = "Content";
+
+        }
+
+        /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
+        protected override void Initialize()
+        {
+            // TODO: Add your initialization logic here
+
+            base.Initialize();
         }
 
         protected override void LoadContent()
@@ -62,32 +87,63 @@ namespace RockRainEnhanced
             _spriteBatch = new SpriteBatch(_graphics.GraphicsDevice);
             Services.AddService(typeof(SpriteBatch), _spriteBatch);
 
+            _audio = new AudioLibrary();
             _audio.LoadContent(this.Content);
             Services.AddService(typeof(AudioLibrary), _audio);
 
-            this._helpBackgroundTexture = Content.Load<Texture2D>("helpbackground");
-            this._helpForegroundTexture = Content.Load<Texture2D>("helpforeground");
-            _helpScene = new HelpScene(this, this._helpBackgroundTexture, this._helpForegroundTexture);
+            helpBackgroundTexture = Content.Load<Texture2D>("helpbackground");
+            helpForegroundTexture = Content.Load<Texture2D>("helpforeground");
+            _helpScene = new HelpScene(this, helpBackgroundTexture, helpForegroundTexture);
             Components.Add(_helpScene);
 
             // Create the Start scene
-            this._smallFont = Content.Load<SpriteFont>("menuSmall");
-            this._largeFont = Content.Load<SpriteFont>("menuLarge");
-            this._startBackgroundTexture = Content.Load<Texture2D>("startBackground");
-            this._startElementsTexture = Content.Load<Texture2D>("startSceneElements");
-            _startScene = new StartScene(this, this._smallFont, this._largeFont, this._startBackgroundTexture, this._startElementsTexture);
+            smallFont = Content.Load<SpriteFont>("menuSmall");
+            largeFont = Content.Load<SpriteFont>("menuLarge");
+            startBackgroundTexture = Content.Load<Texture2D>("startBackground");
+            startElementsTexture = Content.Load<Texture2D>("startSceneElements");
+            _startScene = new StartScene(this, smallFont, largeFont, startBackgroundTexture, startElementsTexture);
             Components.Add(_startScene);
 
-            this._actionElementsTexture = Content.Load<Texture2D>("rockrainenhanced");
-            this._actionBackgroundTexture = Content.Load<Texture2D>("spacebackground");
-            this._scoreFont = Content.Load<SpriteFont>("score");
+            actionElementsTexture = Content.Load<Texture2D>("rockrainenhanced");
+            actionBackgroundTexture = Content.Load<Texture2D>("spacebackground");
+            scoreFont = Content.Load<SpriteFont>("score");
+            scoreFont = Content.Load<SpriteFont>("score");
+            //_actionScene = new ActionScene(this, actionElementsTexture, actionBackgroundTexture, _scoreFont);
+            //Components.Add(_actionScene);
 
-            _joinScene = new JoinScene(this, this._largeFont, this._menuControllers);
+            _joinScene = new JoinScene(this, largeFont, menuControllers);
             Components.Add(_joinScene);
             _startScene.Show();
             _activeScene = _startScene;
-            _scoreScene = new ScoreScene(this, this._largeFont, _highScores, _startBackgroundTexture);
-            Components.Add(_scoreScene);
+        }
+        ActionScene SetUpActionScene2(IController controllerOne, IController controllerTwo)
+        {
+            Components.OfType<ActionScene>().ToList().ForEach(a => { Components.Remove(a); a.Dispose(); });
+            _actionScene = new ActionScene(controllerOne, controllerTwo,this, actionElementsTexture,
+                actionBackgroundTexture, this.GetScreenBounds(),scoreFont);
+            Components.Add(_actionScene);
+            return _actionScene;
+        }
+
+        ActionScene SetupActionScene1(params IController[] controllers)
+        {
+
+            Components.OfType<ActionScene>().ToList().ForEach(a =>
+            {
+                Components.Remove(a);
+                a.Dispose();
+            });
+            _actionScene = new ActionScene(this, actionElementsTexture, actionBackgroundTexture, scoreFont, this.GetScreenBounds(), controllers);
+            return _actionScene;
+        }
+
+        /// <summary>
+        /// UnloadContent will be called once per game and is the place to unload
+        /// all content.
+        /// </summary>
+        protected override void UnloadContent()
+        {
+            // TODO: Unload any non ContentManager content here
         }
 
         /// <summary>
@@ -97,7 +153,7 @@ namespace RockRainEnhanced
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            this._menuControllers.ToList().Distinct().ToList().ForEach(c => c.Update());
+            menuControllers.ToList().Distinct().ToList().ForEach(c => c.Update());
             HandleScenesInput();
 
             base.Update(gameTime);
@@ -114,7 +170,7 @@ namespace RockRainEnhanced
             _spriteBatch.End();
         }
 
-        void HandleScenesInput()
+        private void HandleScenesInput()
         {
             if (_activeScene == _startScene)
             {
@@ -123,6 +179,7 @@ namespace RockRainEnhanced
             else if (_activeScene == _helpScene)
             {
                 HandleHelpSceneInput();
+
             }
             else if (_activeScene == _actionScene)
             {
@@ -136,103 +193,50 @@ namespace RockRainEnhanced
                     ShowScene(_actionScene);
                 }
             }
-            else if (_activeScene == _scoreScene)
-            {
-                HandleScoreSceneInput();
-            }
         }
 
-        void HandleScoreSceneInput()
+        private void HandleHelpSceneInput()
         {
-            if (this._menuControllers.Any(m => m.IsBack))
-            {
-                this.ShowScene(_startScene);
-            }
-        }
-
-        ActionScene SetUpActionScene2(IController controllerOne, IController controllerTwo)
-        {
-            Components.OfType<ActionScene>().ToList().ForEach(
-                a =>
-                {
-                    Components.Remove(a);
-                    a.Dispose();
-                });
-            _actionScene = new ActionScene(
-                controllerOne,
-                controllerTwo,
-                this,
-                this._actionElementsTexture,
-                this._actionBackgroundTexture,
-                this.GetScreenBounds(),
-                this._scoreFont,
-                new Vector2(100, 100));
-            Components.Add(_actionScene);
-            return _actionScene;
-        }
-
-        ActionScene SetupActionScene1(params IController[] controllers)
-        {
-            Components.OfType<ActionScene>().ToList().ForEach(a =>
-            {
-                Components.Remove(a);
-                a.Dispose();
-            });
-            _actionScene = new ActionScene(
-                this,
-                this._actionElementsTexture,
-                this._actionBackgroundTexture,
-                this._scoreFont,
-                this.GetScreenBounds(),
-                new Vector2(100, 100),
-                controllers);
-            return _actionScene;
-        }
-
-        void HandleHelpSceneInput()
-        {
-            if (this._menuControllers.Any(m => m.IsBack || m.IsEnter))
+            if (menuControllers.Any(m => m.IsBack || m.IsEnter))
                 ShowScene(_startScene);
         }
 
-        void HandleStartSceneInput()
+
+        private void HandleStartSceneInput()
         {
-            if (this._menuControllers.Any(m => m.IsEnter))
+            if (menuControllers.Any(m => m.IsEnter))
             {
+
                 _audio.MenuSelect.Play();
 
-                switch ((StartScene.MenuItems)_startScene.SelectedMenuIndex)
+                switch (_startScene.SelectedMenuIndex)
                 {
-                    case StartScene.MenuItems.OnePlayer:
-                        _actionScene = SetupActionScene1(this._menuControllers.ToArray());
+                    case 0:
+                        _actionScene = SetupActionScene1(menuControllers.ToArray());
                         this.Components.Add(_actionScene);
-                        ShowScene(_actionScene); // skip join, use all controllers
+                        ShowScene(_actionScene); //skip join, use all controllers
                         break;
-                    case StartScene.MenuItems.TwoPlayers:
+                    case 1:
                         ShowScene(_joinScene);
                         break;
-                    case StartScene.MenuItems.Help:
+                    case 2:
                         ShowScene(_helpScene);
                         break;
-                    case StartScene.MenuItems.Scores: // scores
-                        this.ShowScene(_scoreScene);
-                        break;
-                    case StartScene.MenuItems.Quit:
+                    case 3:
                         Exit();
                         break;
                 }
             }
         }
 
-        void HandleActionInput()
+        private void HandleActionInput()
         {
-            if ((!_actionScene.TwoPlayers && this._menuControllers.Any(m => m.IsEnter))
-                || (_joinScene.PlayerOne != null && _joinScene.PlayerOne.IsEnter)
-                || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsEnter))
+            
+            if ((!_actionScene.TwoPlayers && menuControllers.Any(m=>m.IsEnter )) || (_joinScene.PlayerOne != null && _joinScene.PlayerOne.IsEnter) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsEnter))
             {
                 if (_actionScene.GameOver)
                 {
-                    ShowScene(_scoreScene);
+                    ShowScene(_startScene);
                 }
                 else
                 {
@@ -241,21 +245,17 @@ namespace RockRainEnhanced
                 }
             }
 
-            if ((!_actionScene.TwoPlayers && this._menuControllers.Any(m => m.IsBack))
-                || (_joinScene.PlayerOne != null && _joinScene.PlayerOne.IsBack)
-                || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsBack))
+            if ((!_actionScene.TwoPlayers && menuControllers.Any(m=>m.IsBack)) || (_joinScene.PlayerOne!= null && _joinScene.PlayerOne.IsBack ) || (_joinScene.PlayerTwo != null && _joinScene.PlayerTwo.IsBack))
             {
                 ShowScene(_startScene);
             }
         }
 
-        void ShowScene(GameScene scene)
+        protected void ShowScene(GameScene scene)
         {
             _activeScene.Hide();
-            
             _activeScene = scene;
             scene.Show();
-            Debug.WriteLine("Active scene is now " + scene.GetType().Name);
         }
     }
 }

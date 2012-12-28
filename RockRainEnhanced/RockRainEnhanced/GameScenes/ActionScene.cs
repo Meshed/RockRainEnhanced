@@ -1,153 +1,138 @@
 using System;
 using System.Linq;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-
-using RockRainEnhanced.ControllerStrategy;
+using RockRain;
 using RockRainEnhanced.Core;
+using RockRainEnhanced.ControllerStrategy;
 
 namespace RockRainEnhanced.GameScenes
 {
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
     public class ActionScene : GameScene
     {
-        readonly Texture2D _actionTexture;
+        private readonly Texture2D _actionTexture;
+        private readonly AudioLibrary _audio;
+        private readonly SpriteBatch _spriteBatch;
+        private readonly Player _player1;
+        private readonly Player _player2;
+        private readonly MeteorsManager _meteors;
+        private readonly PowerSource _powerSource;
+        private readonly Wrench _wrench;
+        private readonly SimpleRumblePad _rumblePad;
+        private readonly ImageComponent _background;
+        private readonly Score _scorePlayer1;
+        private readonly Score _scorePlayer2;
+        private Vector2 _pausePosition;
+        private Vector2 _gameoverPosition;
+        private Rectangle _pauseRect = new Rectangle(1, 120, 200, 44);
+        private Rectangle _gameoverRect = new Rectangle(1, 170, 350, 48);
+        private readonly Color _criticalFontColor = Color.Red;
+        private readonly Color _player1FontColor = Color.Blue;
+        private readonly Color _player2FontColor = Color.Green;
+        private bool _paused;
+        private bool _gameOver;
+        private TimeSpan _elapsedTime = TimeSpan.Zero;
+        private TimeSpan _wrenchElapsedTime = TimeSpan.Zero;
+        private bool _twoPlayers;
+        Game1 game1;
+        Texture2D actionElementsTexture;
+        Texture2D actionBackgroundTexture;
+        SpriteFont scoreFont;
+        IController[] controllers;
 
-        readonly AudioLibrary _audio;
-
-        readonly SpriteBatch _spriteBatch;
-
-        readonly Player _player1;
-
-        readonly Player _player2;
-
-        readonly MeteorsManager _meteors;
-
-        readonly PowerSource _powerSource;
-
-        readonly SimpleRumblePad _rumblePad;
-
-        readonly ImageComponent _background;
-
-        readonly Score _scorePlayer1;
-        readonly Score _scorePlayer2;
 #if DEBUG
-        readonly TextComponent _positionDebugText;
+        TextComponent positionDebugText;
 #endif
-        readonly Rectangle _gameoverRect = new Rectangle(1, 170, 350, 48);
-        readonly SpriteFont _scoreFont;
-        readonly Vector2 _gameoverPosition;
-        Rectangle _pauseRect = new Rectangle(1, 120, 200, 44);
-        Vector2 _pausePosition;
-        
-        bool _paused;
-        bool _gameOver;
-        TimeSpan _elapsedTime = TimeSpan.Zero;
-        bool _twoPlayers;
-        
 
-        public ActionScene(
-            Game game,
-            Texture2D theTexture,
-            Texture2D backgroundTexture,
-            SpriteFont font,
-            Rectangle screenBounds,
-            Vector2 gameoverPosition,
-            params IController[] controllers)
-            : this(game, theTexture, backgroundTexture, font, gameoverPosition)
+        ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font):base(game)
+        {
+            _audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
+            _background = new ImageComponent(game, backgroundTexture, ImageComponent.DrawMode.Stretch);
+            Components.Add(_background);
+
+            _actionTexture = theTexture;
+
+            _spriteBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
+            _meteors = new MeteorsManager(Game, ref _actionTexture);
+            Components.Add(_meteors);
+
+
+            // TODO: Complete member initialization
+            this.game1 = game1;
+            this.actionElementsTexture = actionElementsTexture;
+            this.actionBackgroundTexture = actionBackgroundTexture;
+            this.scoreFont = font;
+            
+            _scorePlayer1 = new Score(game, font, _player1FontColor);
+            _scorePlayer1.Position = new Vector2(10, 10);
+            Components.Add(_scorePlayer1);
+           
+
+            _rumblePad = new SimpleRumblePad(game);
+            Components.Add(_rumblePad);
+
+            _powerSource = new PowerSource(game, ref _actionTexture);
+            _powerSource.Initialize();
+            Components.Add(_powerSource);
+
+            _wrench = new Wrench(game, game.Content.Load<Texture2D>("wrench"));
+            _wrench.Initialize();
+            Components.Add(_wrench);
+
+#if DEBUG
+            positionDebugText=new TextComponent(game,this.scoreFont,new Vector2(),Color.Red);
+            Components.Add(positionDebugText);            
+#endif
+        }
+        public ActionScene(Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font,Rectangle screenBounds, params IController[] controllers)
+            :this(game,theTexture,backgroundTexture,font)
         {
             this.TwoPlayers = false;
-            this._player1 = new Player(
-                Game,
-                ref this._actionTexture,
-                new Vector2(x: screenBounds.Width / 3, y: 0),
-                new Rectangle(323, 15, 30, 30),
-                controllers);
-            this._player1.Initialize();
-            Components.Add(this._player1);
+            _player1 = new Player(Game, ref _actionTexture,  new Vector2(screenBounds.Width / 3, 0), new Rectangle(323, 15, 30, 30),controllers);
+            _player1.Initialize();
+            Components.Add(_player1);   
         }
-
-        public ActionScene(
-            IController playerOneController,
-            IController playerTwoController,
-            Game game,
-            Texture2D theTexture,
-            Texture2D backgroundTexture,
-            Rectangle screenBounds,
-            SpriteFont font,
-            Vector2 gameoverPosition)
-            : this(game, theTexture, backgroundTexture, font, gameoverPosition)
+        public ActionScene(IController playerOneController,IController playerTwoController,Game game, Texture2D theTexture, Texture2D backgroundTexture,Rectangle screenBounds, SpriteFont font)
+            : this(game, theTexture, backgroundTexture, font)
         {
+            
             this.TwoPlayers = true;
-            this._player1 = new Player(Game, ref this._actionTexture, new Vector2(x: screenBounds.Width / 3, y: 0), new Rectangle(323, 15, 30, 30), playerOneController);
-            this._player1.Initialize();
-            Components.Add(this._player1);
-            this._scorePlayer2 = new Score(game, font, Color.Red)
-                               {
-                                   Position =
-                                       new Vector2(
-                                       this.Game.Window.ClientBounds.Width - 200, 10)
-                               };
-            Components.Add(this._scorePlayer2);
-            this._player2 = new Player(Game, ref this._actionTexture, new Vector2((int)(screenBounds.Width / 1.5), 0), new Rectangle(360, 17, 30, 30), playerTwoController);
-            this._player2.Initialize();
-            Components.Add(this._player2);
+            _player1 = new Player(Game, ref _actionTexture,new Vector2(screenBounds.Width / 3, 0), new Rectangle(323, 15, 30, 30),playerOneController);
+            _player1.Initialize();
+            Components.Add(_player1);
+
+            _scorePlayer2 = new Score(game, font, _player2FontColor);
+            _scorePlayer2.Position = new Vector2(Game.Window.ClientBounds.Width - 200, 10);
+            Components.Add(_scorePlayer2);
+            _player2 = new Player(Game, ref _actionTexture, new Vector2((int)(screenBounds.Width / 1.5), 0), new Rectangle(360, 17, 30, 30), playerTwoController);
+            _player2.Initialize();
+            Components.Add(_player2);
         }
 
-        ActionScene(
-            Game game, Texture2D theTexture, Texture2D backgroundTexture, SpriteFont font, Vector2 gameoverPosition)
-            : base(game)
-        {
-            this._audio = (AudioLibrary)Game.Services.GetService(typeof(AudioLibrary));
-            this._background = new ImageComponent(game, backgroundTexture, ImageComponent.DrawMode.Stretch);
-            Components.Add(this._background);
-            this._actionTexture = theTexture;
-            this._spriteBatch = (SpriteBatch)Game.Services.GetService(typeof(SpriteBatch));
-            this._meteors = new MeteorsManager(Game, ref this._actionTexture);
-            Components.Add(this._meteors);
-            this._scoreFont = font;
-            this._gameoverPosition = gameoverPosition;
-            this._scorePlayer1 = new Score(game, font, Color.Blue) { Position = new Vector2(10, 10) };
-            Components.Add(this._scorePlayer1);
-           
-            this._rumblePad = new SimpleRumblePad(game);
-            Components.Add(this._rumblePad);
-            this._powerSource = new PowerSource(game, ref this._actionTexture);
-            Components.Add(this._powerSource);
-#if DEBUG
-            this._positionDebugText = new TextComponent(game, this._scoreFont, new Vector2(), Color.Red);
-            Components.Add(this._positionDebugText);
-#endif
-        }
       
+
         public bool TwoPlayers
         {
-            get { return this._twoPlayers; }
-            set { this._twoPlayers = value; }
+            get { return _twoPlayers; }
+            set { _twoPlayers = value; }
         }
 
         public bool GameOver
         {
-            get { return this._gameOver; }
+            get { return _gameOver; }
         }
 
         public bool Paused
         {
-            get
-            {
-                return this._paused;
-            }
-
+            get { return _paused; }
             set
             {
-                this._paused = value;
-                if (this._paused)
+                _paused = value;
+                if (_paused)
                 {
                     MediaPlayer.Pause();
                 }
@@ -158,26 +143,37 @@ namespace RockRainEnhanced.GameScenes
             }
         }
 
-        [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1407:ArithmeticExpressionsMustDeclarePrecedence", Justification = "Reviewed. Suppression is OK here.")]
         public override void Show()
         {
-            MediaPlayer.Play(this._audio.BackMusic);
-            this._meteors.Initialize();
-            this._powerSource.PutinStartPosition();
+            
+            MediaPlayer.Play(_audio.BackMusic);
+            _meteors.Initialize();
+            _powerSource.PutinStartPosition();
+            _wrench.PutinStartPosition();
 
-            this._player1.Reset();
-            if (this._twoPlayers)
+            _player1.Reset();
+            if (_twoPlayers)
             {
-                this._player2.Reset();
-                this._player2.Visible = this._twoPlayers;
-                this._player2.Enabled = this._twoPlayers;
-                this._scorePlayer2.Visible = this._twoPlayers;
-                this._scorePlayer2.Enabled = this._twoPlayers;
+                
+                _player2.Reset();
+                _player2.Visible = _twoPlayers;
+                _player2.Enabled = _twoPlayers;
+                _scorePlayer2.Visible = _twoPlayers;
+                _scorePlayer2.Enabled = _twoPlayers;
+                _scorePlayer2.Visible = _twoPlayers;
+                _scorePlayer2.Enabled = _twoPlayers;
             }
+            
+            _paused = false;
+            _pausePosition.X = (Game.Window.ClientBounds.Width - _pauseRect.Width)/2;
+            _pausePosition.Y = (Game.Window.ClientBounds.Height - _pauseRect.Height)/2;
 
-            this._paused = false;
-            this._pausePosition.X = Game.Window.ClientBounds.Width - this._pauseRect.Width / 2;
-            this._pausePosition.Y = Game.Window.ClientBounds.Height - this._pauseRect.Height / 2;
+            _gameOver = false;
+            _gameoverPosition.X = (Game.Window.ClientBounds.Width - _gameoverRect.Width)/2;
+            _gameoverPosition.Y = (Game.Window.ClientBounds.Height - _gameoverRect.Height)/2;
+
+          
+          
 
             base.Show();
         }
@@ -190,48 +186,217 @@ namespace RockRainEnhanced.GameScenes
         }
 
         /// <summary>
+        /// Allows the game component to perform any initialization it needs to before starting
+        /// to run.  This is where it can query for any required services and load content.
+        /// </summary>
+        public override void Initialize()
+        {
+            // TODO: Add your initialization code here
+
+            base.Initialize();
+        }
+
+        /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            if ((!this._paused) && (!this._gameOver))
+            
+            if ((!_paused) && (!_gameOver))
             {
                 HandleDamages();
 
                 HandlePowerSourceSprite(gameTime);
+                HandleWrenchSprite(gameTime);
 
                 // Update score
-                this._scorePlayer1.Value = this._player1.Score;
-                this._scorePlayer1.Power = this._player1.Power;
-                if (this._twoPlayers)
+                _scorePlayer1.Value = _player1.Score;
+                _scorePlayer1.Power = _player1.Power;
+                _scorePlayer1.PowerFontColor = _scorePlayer1.Power <= 30 ? _criticalFontColor : _player1FontColor;
+
+                if (_twoPlayers)
                 {
-                    this._scorePlayer2.Value = this._player2.Score;
-                    this._scorePlayer2.Power = this._player2.Power;
+                    _scorePlayer2.Value = _player2.Score;
+                    _scorePlayer2.Power = _player2.Power;
+                    _scorePlayer2.PowerFontColor = _scorePlayer2.Power <= 30 ? _criticalFontColor : _player2FontColor;
                 }
 
                 // Check if player is dead
-                this._gameOver = (this._player1.Power <= 0) || (this._player2 != null && this._player2.Power <= 0);
-                if (this._gameOver)
+                _gameOver = ((_player1.Power <= 0) || (_player2 != null && _player2.Power <= 0));
+                if (_gameOver)
                 {
-                    this._player1.Visible = this._player1.Power > 0;
-                    if (this._twoPlayers)
+                    _player1.Visible = (_player1.Power > 0);
+                    if (_twoPlayers)
                     {
-                        this._player2.Visible = this._player2.Power > 0;
+                        if (_player2 != null) _player2.Visible = (_player2.Power > 0);
                     }
-
                     MediaPlayer.Stop();
                 }
 
                 base.Update(gameTime);
             }
 
-            if (this._gameOver)
+            if (_gameOver)
             {
-                this._meteors.Update(gameTime);
+                _meteors.Update(gameTime);
+            }
+#if DEBUG
+            positionDebugText.Text =( _player2 ?? _player1).GetBounds().ToString();
+#endif
+        }
+
+        private void HandleDamages()
+        {
+            // Check collision for Player 1
+            if (_meteors.CheckForCollisions(_player1.GetBounds()))
+            {
+                _player1.Power -= 10;
+                _player1.PowerLossPerSecond++;
+                _player1.Score -= 1;
             }
 
-            this._positionDebugText.Text = (this._player2 ?? this._player1).GetBounds().ToString();
+            // Check collisions for Player 2
+            if (_twoPlayers)
+            {
+                if (_meteors.CheckForCollisions(_player2.GetBounds()))
+                {
+                    _player2.Power -= 10;
+                    _player2.PowerLossPerSecond++;
+                    _player2.Score -= 1;
+                }
+
+                // Check for collision between players
+                if (_player1.GetBounds().Intersects(_player2.GetBounds()))
+                {
+                    if (_player1.Position.X < _player2.Position.X)
+                    {
+                        _player1.StopLeft(_player2.Position.X);
+                        _player2.StopRight(_player1.Position.X);
+                    }
+                    else
+                    {
+                        _player1.StopRight(_player2.Position.X);
+                        _player2.StopLeft(_player1.Position.X);
+                    }
+
+                    if (_player1.Position.Y < _player2.Position.Y)
+                    {
+                        _player1.StopDown(_player2.Position.Y);
+                        _player2.StopUp(_player1.Position.Y);
+                    }
+                    else
+                    {
+                        _player1.StopUp(_player2.Position.Y);
+                        _player2.StopDown(_player1.Position.Y);
+                    }
+                }
+            }
+        }
+
+        private void HandlePowerSourceSprite(GameTime gameTime)
+        {
+            if (_powerSource.CheckCollision(_player1.GetBounds()))
+            {
+                _audio.PowerGet.Play();
+                _elapsedTime = TimeSpan.Zero;
+                _powerSource.PutinStartPosition();
+                _player1.Power += _powerSource.EffectValue;
+
+                if (_player1.Power > 100)
+                {
+                    _player1.Power = 100;
+                }
+
+                if (_player1.Power < 0)
+                {
+                    _player1.Power = 0;
+                }
+            }
+
+            if (_twoPlayers)
+            {
+                if (_powerSource.CheckCollision(_player2.GetBounds()))
+                {
+                    _audio.PowerGet.Play();
+                    _powerSource.PutinStartPosition();
+                    _player2.Power += _powerSource.EffectValue;
+
+                    if (_player2.Power > 100)
+                    {
+                        _player2.Power = 100;
+                    }
+
+                    if (_player2.Power < 0)
+                    {
+                        _player2.Power = 0;
+                    }
+                }
+            }
+
+            // Check for sending a new power source
+            _elapsedTime += gameTime.ElapsedGameTime;
+            if (_elapsedTime > TimeSpan.FromSeconds(10))
+            {
+                _elapsedTime -= TimeSpan.FromSeconds(10);
+                _powerSource.Enabled = true;
+            }
+        }
+        private void HandleWrenchSprite(GameTime gameTime)
+        {
+            if (_wrench.CheckCollision(_player1.GetBounds()))
+            {
+                _audio.PowerGet.Play();
+                _wrenchElapsedTime = TimeSpan.Zero;
+                _wrench.PutinStartPosition();
+                _player1.PowerLossPerSecond -= _wrench.EffectValue;
+                if (_player1.PowerLossPerSecond < 1)
+                {
+                    _player1.PowerLossPerSecond = 1;
+                }
+
+                if (_player1.Power > 100)
+                {
+                    _player1.Power = 100;
+                }
+
+                if (_player1.Power < 0)
+                {
+                    _player1.Power = 0;
+                }
+            }
+
+            if (_twoPlayers)
+            {
+                if (_wrench.CheckCollision(_player2.GetBounds()))
+                {
+                    _audio.PowerGet.Play();
+                    _wrench.PutinStartPosition();
+                    _player2.PowerLossPerSecond -= _wrench.EffectValue;
+                    if (_player2.PowerLossPerSecond < 1)
+                    {
+                        _player2.PowerLossPerSecond = 1;
+                    }
+
+                    if (_player2.Power > 100)
+                    {
+                        _player2.Power = 100;
+                    }
+
+                    if (_player2.Power < 0)
+                    {
+                        _player2.Power = 0;
+                    }
+                }
+            }
+
+            // Check for sending a new wrench
+            _wrenchElapsedTime += gameTime.ElapsedGameTime;
+            if (_wrenchElapsedTime > TimeSpan.FromSeconds(15))
+            {
+                _wrenchElapsedTime -= TimeSpan.FromSeconds(15);
+                _wrench.Enabled = true;
+            }
         }
 
         public override void Draw(GameTime gameTime)
@@ -248,72 +413,14 @@ namespace RockRainEnhanced.GameScenes
                 throw new InvalidOperationException("Players are not top component");
             }
 
-            if (this._paused)
+            if (_paused)
             {
-                this._spriteBatch.Draw(this._actionTexture, this._pausePosition, this._pauseRect, Color.White);
+                _spriteBatch.Draw(_actionTexture, _pausePosition, _pauseRect, Color.White);
             }
 
-            if (this._gameOver)
+            if (_gameOver)
             {
-                this._spriteBatch.Draw(this._actionTexture, this._gameoverPosition, this._gameoverRect, Color.White);
-            }
-        }
-
-        void HandleDamages()
-        {
-            // Check collision for Player 1
-            if (this._meteors.CheckForCollisions(this._player1.GetBounds()))
-            {
-                this._player1.Power -= 10;
-                this._player1.Score -= 1;
-            }
-
-            // Check collisions for Player 2
-            if (this._twoPlayers)
-            {
-                if (this._meteors.CheckForCollisions(this._player2.GetBounds()))
-                {
-                    this._player2.Power -= 10;
-                    this._player2.Score -= 10;
-                }
-
-                // Check for collision between players
-                if (this._player1.GetBounds().Intersects(this._player2.GetBounds()))
-                {
-                    this._player1.Power -= 10;
-                    this._player1.Score -= 10;
-                    this._player2.Power -= 10;
-                    this._player2.Score -= 10;
-                }
-            }
-        }
-
-        void HandlePowerSourceSprite(GameTime gameTime)
-        {
-            if (this._powerSource.CheckCollision(this._player1.GetBounds()))
-            {
-                this._audio.PowerGet.Play();
-                this._elapsedTime = TimeSpan.Zero;
-                this._powerSource.PutinStartPosition();
-                this._player1.Power += 50;
-            }
-
-            if (this._twoPlayers)
-            {
-                if (this._powerSource.CheckCollision(this._player2.GetBounds()))
-                {
-                    this._audio.PowerGet.Play();
-                    this._powerSource.PutinStartPosition();
-                    this._player2.Power += 50;
-                }
-            }
-
-            // Check for sending a new power source
-            this._elapsedTime += gameTime.ElapsedGameTime;
-            if (this._elapsedTime > TimeSpan.FromSeconds(15))
-            {
-                this._elapsedTime -= TimeSpan.FromSeconds(15);
-                this._powerSource.Enabled = true;
+                _spriteBatch.Draw(_actionTexture, _gameoverPosition, _gameoverRect, Color.White);
             }
         }
     }

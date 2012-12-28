@@ -1,72 +1,54 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+
+
 namespace RockRainEnhanced.Core
 {
-    using System;
-    using System.Collections.Generic;
-
-    using Microsoft.Xna.Framework;
-    using Microsoft.Xna.Framework.Graphics;
-
-    using RockRainEnhanced.Extensions;
-
     /// <summary>
     /// This is a game component that implements IUpdateable.
     /// </summary>
-    public class Sprite : DrawableGameComponent
+    public class Sprite : Microsoft.Xna.Framework.DrawableGameComponent
     {
-        readonly Texture2D _texture;
+        private int activeFrame;
+        protected readonly Texture2D texture;
+        private List<Rectangle> frames;
 
-        long _frameDelay;
+        protected Vector2 position;
+        protected TimeSpan elapsedTime = TimeSpan.Zero;
+        protected Rectangle currentFrame;
+        protected long frameDelay;
+        protected SpriteBatch sbBatch;
 
-        int _activeFrame;
-        
-        List<Rectangle> _frames;
-
-        Vector2 _position;
-
-        TimeSpan _elapsedTime = TimeSpan.Zero;
-
-        SpriteBatch _spriteBatch;
-
-        public Sprite(Game game, ref Texture2D theTexture, Vector2 position = new Vector2(), long frameDelay = 0)
+        public Sprite(Game game, ref Texture2D theTexture)
             : base(game)
         {
-            this._texture = theTexture;
-            this._activeFrame = 0;
-            this.Position = position;
-            this.FrameDelay = frameDelay;
-            this._spriteBatch = Game.GetGameService<SpriteBatch>();
+            texture = theTexture;
+            activeFrame = 0;
         }
 
         public List<Rectangle> Frames
         {
-            get { return this._frames; }
-            set { this._frames = value; }
+            get { return frames; }
+            set { frames = value; }
         }
 
-        protected Rectangle CurrentFrame { get; set; }
-
-        protected Vector2 Position
+        /// <summary>
+        /// Allows the game component to perform any initialization it needs to before starting
+        /// to run.  This is where it can query for any required services and load content.
+        /// </summary>
+        public override void Initialize()
         {
-            get
-            {
-                return this._position;
-            }
-            set
-            {
-                this._position = value;
-            }
-        }
+            sbBatch = (SpriteBatch) Game.Services.GetService(typeof (SpriteBatch));
 
-        protected long FrameDelay
-        {
-            get
-            {
-                return this._frameDelay;
-            }
-            set
-            {
-                this._frameDelay = value;
-            }
+            base.Initialize();
         }
 
         /// <summary>
@@ -75,21 +57,21 @@ namespace RockRainEnhanced.Core
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            this._elapsedTime += gameTime.ElapsedGameTime;
+            elapsedTime += gameTime.ElapsedGameTime;
 
             // It's time for a next frame?
-            if (this._elapsedTime > TimeSpan.FromMilliseconds(this.FrameDelay))
+            if (elapsedTime > TimeSpan.FromMilliseconds(frameDelay))
             {
-                this._elapsedTime -= TimeSpan.FromMilliseconds(this.FrameDelay);
-                this._activeFrame++;
+                elapsedTime -= TimeSpan.FromMilliseconds(frameDelay);
+                activeFrame++;
 
-                if (this._activeFrame == this._frames.Count)
+                if (activeFrame == frames.Count)
                 {
-                    this._activeFrame = 0;
+                    activeFrame = 0;
                 }
 
                 // Get the current frame
-                this.CurrentFrame = this._frames[this._activeFrame];
+                currentFrame = frames[activeFrame];
             }
 
             base.Update(gameTime);
@@ -97,8 +79,7 @@ namespace RockRainEnhanced.Core
 
         public override void Draw(GameTime gameTime)
         {
-            if(_spriteBatch != null)
-            this._spriteBatch.Draw(this._texture, this.Position, this.CurrentFrame, Color.White);
+            sbBatch.Draw(texture, position, currentFrame, Color.White);
 
             base.Draw(gameTime);
         }

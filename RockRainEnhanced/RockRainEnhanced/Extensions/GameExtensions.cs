@@ -1,15 +1,22 @@
-﻿namespace RockRainEnhanced.Extensions
-{
-    using Microsoft.Xna.Framework;
+﻿// -----------------------------------------------------------------------
+// <copyright file="GameExtensions.cs" company="">
+// TODO: Update copyright text.
+// </copyright>
+// -----------------------------------------------------------------------
 
+namespace RockRainEnhanced.Extensions
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+using Microsoft.Xna.Framework;
+
+    /// <summary>
+    /// TODO: Update summary.
+    /// </summary>
     public static class GameExtensions
     {
-
-        public static T GetGameService<T>(this Game game)
-        {
-            return (T)game.Services.GetService(typeof(T));
-        }
-
         public static Rectangle GetScreenBounds(this Game game)
         {
 #if XBOX360
@@ -20,10 +27,9 @@
                                          game.Window.ClientBounds.Height -
                                          (int) (game.Window.ClientBounds.Height*0.03f));
 #else
-            return new Rectangle(0, 0, game.Window.ClientBounds.Width, game.Window.ClientBounds.Height);
+            return new Rectangle(0, 0, game.Window.ClientBounds.Width,
+                                         game.Window.ClientBounds.Height);
 #endif
         }
-
-       
     }
 }
