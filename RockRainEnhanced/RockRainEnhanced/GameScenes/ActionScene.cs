@@ -307,6 +307,7 @@ namespace RockRainEnhanced.GameScenes
                 _audio.PowerGet.Play();
                 _elapsedTime = TimeSpan.Zero;
                 _powerSource.PutinStartPosition();
+                _player1.Score += _player1.Power > 50 ? 10 : 5;
                 _player1.Power += _powerSource.EffectValue;
 
                 if (_player1.Power > 100)
@@ -355,6 +356,16 @@ namespace RockRainEnhanced.GameScenes
                 _audio.PowerGet.Play();
                 _wrenchElapsedTime = TimeSpan.Zero;
                 _wrench.PutinStartPosition();
+
+                if (_player1.PowerLossPerSecond > 1)
+                {
+                    _player1.Score += 5;
+                }
+                else
+                {
+                    _player1.Score += 10;
+                }
+
                 _player1.PowerLossPerSecond -= _wrench.EffectValue;
                 if (_player1.PowerLossPerSecond < 1)
                 {
