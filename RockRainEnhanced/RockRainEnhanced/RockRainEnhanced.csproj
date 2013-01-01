@@ -91,6 +91,7 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\GameExtensions.cs" />
     <Compile Include="GameScenes\ActionScene.cs" />
+    <Compile Include="GameScenes\CreditScene.cs" />
     <Compile Include="GameScenes\HelpScene.cs" />
     <Compile Include="GameScenes\JoinScene.cs" />
     <Compile Include="GameScenes\StartScene.cs" />

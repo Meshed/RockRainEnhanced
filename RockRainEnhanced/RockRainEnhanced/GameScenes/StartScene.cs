@@ -18,18 +18,18 @@ namespace RockRainEnhanced.GameScenes
     /// </summary>
     public class StartScene : GameScene
     {
-        protected TextMenuComponent menu;
-        protected readonly Texture2D elements;
-        protected AudioLibrary audio;
-        protected SpriteBatch spriteBatch = null;
-        protected Rectangle rockRect = new Rectangle(0, 0, 536, 131);
-        protected Vector2 rockPosition;
-        protected Rectangle rainRect = new Rectangle(120, 165, 517, 130);
-        protected Vector2 rainPosition;
-        protected Rectangle enhancedRect = new Rectangle(8, 304, 375, 144);
-        protected Vector2 enhancedPosition;
-        protected bool showEnchanced;
-        protected TimeSpan elapsedTime = TimeSpan.Zero;
+        private TextMenuComponent menu;
+        private readonly Texture2D elements;
+        private AudioLibrary audio;
+        private SpriteBatch spriteBatch = null;
+        private Rectangle rockRect = new Rectangle(0, 0, 536, 131);
+        private Vector2 rockPosition;
+        private Rectangle rainRect = new Rectangle(120, 165, 517, 130);
+        private Vector2 rainPosition;
+        private Rectangle enhancedRect = new Rectangle(8, 304, 375, 144);
+        private Vector2 enhancedPosition;
+        private bool showEnchanced;
+        private TimeSpan elapsedTime = TimeSpan.Zero;
 
         public StartScene(Game game, SpriteFont smallFont, SpriteFont largeFont, Texture2D background, Texture2D elements)
             : base(game)
@@ -37,7 +37,7 @@ namespace RockRainEnhanced.GameScenes
             this.elements = elements;
             Components.Add(new ImageComponent(game, background, ImageComponent.DrawMode.Center));
 
-            string[] items = {"One Player", "Two Players", "Help", "Quit"};
+            string[] items = {"One Player", "Two Players", "Help", "Credits", "Quit"};
             menu = new TextMenuComponent(game, smallFont, largeFont);
             menu.SetMenuItems(items);
             Components.Add(menu);
@@ -52,8 +52,6 @@ namespace RockRainEnhanced.GameScenes
         /// </summary>
         public override void Initialize()
         {
-            // TODO: Add your initialization code here
-
             base.Initialize();
         }
 
@@ -77,7 +75,6 @@ namespace RockRainEnhanced.GameScenes
                 {
                     menu.Visible = true;
                     menu.Enabled = true;
-
                     MediaPlayer.Play(audio.StartMusic);
 
 #if XBOX360

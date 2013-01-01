@@ -24,6 +24,7 @@ namespace RockRainEnhanced
         ActionScene _actionScene;
         JoinScene _joinScene;
         GameScene _activeScene;
+        private CreditScene _creditScene;
 
         // Textures
         protected Texture2D helpBackgroundTexture, helpForegroundTexture;
@@ -98,6 +99,8 @@ namespace RockRainEnhanced
             startElementsTexture = Content.Load<Texture2D>("startSceneElements");
             _startScene = new StartScene(this, smallFont, largeFont, startBackgroundTexture, startElementsTexture);
             Components.Add(_startScene);
+            _creditScene = new CreditScene(this, smallFont, largeFont, startBackgroundTexture, startElementsTexture);
+            Components.Add(_creditScene);
 
             actionElementsTexture = Content.Load<Texture2D>("rockrainenhanced");
             actionBackgroundTexture = Content.Load<Texture2D>("spacebackground");
@@ -188,15 +191,16 @@ namespace RockRainEnhanced
                     ShowScene(_actionScene);
                 }
             }
+            else if (_activeScene == _creditScene)
+            {
+                HandleCreditsInput();
+            }
         }
-
         private void HandleHelpSceneInput()
         {
             if (menuControllers.Any(m => m.IsBack || m.IsEnter))
                 ShowScene(_startScene);
         }
-
-
         private void HandleStartSceneInput()
         {
             if (menuControllers.Any(m => m.IsEnter))
@@ -208,8 +212,8 @@ namespace RockRainEnhanced
                 {
                     case 0:
                         _actionScene = SetupActionScene1(menuControllers.ToArray());
-                        this.Components.Add(_actionScene);
-                        ShowScene(_actionScene); //skip join, use all controllers
+                        Components.Add(_actionScene);
+                        ShowScene(_actionScene);
                         break;
                     case 1:
                         ShowScene(_joinScene);
@@ -218,12 +222,14 @@ namespace RockRainEnhanced
                         ShowScene(_helpScene);
                         break;
                     case 3:
+                        ShowScene(_creditScene);
+                        break;
+                    case 4:
                         Exit();
                         break;
                 }
             }
         }
-
         private void HandleActionInput()
         {
             
@@ -244,6 +250,11 @@ namespace RockRainEnhanced
             {
                 ShowScene(_startScene);
             }
+        }
+        private void HandleCreditsInput()
+        {
+            if (menuControllers.Any(m => m.IsBack || m.IsEnter))
+                ShowScene(_startScene);
         }
 
         protected void ShowScene(GameScene scene)
