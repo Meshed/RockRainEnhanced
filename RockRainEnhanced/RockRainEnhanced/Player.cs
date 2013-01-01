@@ -94,6 +94,10 @@ namespace RockRainEnhanced
                 _elapsedTime -= TimeSpan.FromSeconds(1);
                 _score++;
                 Power -= PowerLossPerSecond;
+                if (Power < 0)
+                {
+                    Power = 0;
+                }
             }
 
             base.Update(gameTime);

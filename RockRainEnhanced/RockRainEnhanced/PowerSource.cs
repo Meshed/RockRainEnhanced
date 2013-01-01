@@ -47,7 +47,7 @@ namespace RockRainEnhanced
             frameDelay = 200;
             Random = new Random(GetHashCode());
             PutinStartPosition();
-            EffectValue = 25;
+            EffectValue = 50;
         }
 
         /// <summary>

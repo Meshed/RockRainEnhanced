@@ -17,7 +17,16 @@ namespace RockRainEnhanced
     /// </summary>
     public class GameScene : Microsoft.Xna.Framework.DrawableGameComponent
     {
+        protected enum SceneState
+        {
+            Running,
+            Paused,
+            GameOver
+        }
+
         private readonly List<GameComponent> components;
+        protected SceneState CurrentState;
+        protected SceneState PreviousState;
 
         public List<GameComponent> Components
         {

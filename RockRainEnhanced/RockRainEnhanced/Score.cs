@@ -22,6 +22,7 @@ namespace RockRainEnhanced
             get { return _power; }
             set { _power = value; }
         }
+        public int PowerDrain { get; set; }
         public Vector2 Position
         {
             get { return _position; }
@@ -54,6 +55,11 @@ namespace RockRainEnhanced
 
             float height = _font.MeasureString(textToDraw).Y;
             textToDraw = string.Format("Power: {0}", _power);
+            _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X + 1, _position.Y + 1 + height), Color.Black);
+            _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X, _position.Y + height), PowerFontColor);
+
+            height += height;
+            textToDraw = string.Format("Drain: {0}", PowerDrain);
             _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X + 1, _position.Y + 1 + height), Color.Black);
             _spriteBatch.DrawString(_font, textToDraw, new Vector2(_position.X, _position.Y + height), PowerFontColor);
 
